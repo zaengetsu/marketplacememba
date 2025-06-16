@@ -133,10 +133,16 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/cart'
+import { useOrderStore } from '@/stores/orders'
+import { useAuthStore } from '@/stores/auth'
 import type { Product } from '@/types/product'
 
+const router = useRouter()
 const cartStore = useCartStore()
+const orderStore = useOrderStore()
+const authStore = useAuthStore()
 const checkoutLoading = ref(false)
 
 const getCurrentPrice = (product: Product) => {
@@ -159,22 +165,48 @@ const formatTime = (date: Date) => {
 }
 
 const proceedToCheckout = async () => {
+  if (!authStore.isAuthenticated) {
+    router.push('/login')
+    return
+  }
+
   checkoutLoading.value = true
   
   try {
-    // Ici on intégrerait Stripe
-    // Pour l'instant, on simule juste
+    // Adresse temporaire (en prod, on demanderait à l'utilisateur)
+    const shippingAddress = {
+      street: '123 Rue Example',
+      city: 'Paris',
+      postalCode: '75001',
+      country: 'France'
+    }
+
+    // 1. Créer commande + intention de paiement
+    const { order, paymentIntent } = await orderStore.processCheckout(
+      cartStore.items,
+      shippingAddress
+    )
+
+    console.log('✅ Commande créée:', order)
+    console.log('💳 Intention de paiement créée:', paymentIntent)
+
+    // 2. Simulation du paiement (remplacez par Stripe Elements en vrai)
     await new Promise(resolve => setTimeout(resolve, 2000))
     
-    // Redirection vers la page de paiement Stripe
-    console.log('Redirection vers Stripe avec:', {
-      items: cartStore.items,
-      total: cartStore.totalPrice
-    })
+    // 3. Confirmer le paiement
+    await orderStore.confirmPayment(paymentIntent.id, order.id)
     
-    // cartStore.clearCart() // Après paiement réussi
-  } catch (error) {
-    console.error('Erreur lors du checkout:', error)
+    console.log('✅ Paiement confirmé! Commande:', order.id)
+    
+    // 4. Vider le panier et rediriger
+    cartStore.clearCart()
+    
+    // Rediriger vers la page de confirmation
+    router.push(`/order-confirmation/${order.id}`)
+    
+  } catch (error: any) {
+    console.error('❌ Erreur lors du checkout:', error)
+    alert(`Erreur: ${error.message}`)
   } finally {
     checkoutLoading.value = false
   }

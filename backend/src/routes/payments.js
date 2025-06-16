@@ -81,6 +81,35 @@ router.post('/confirm', authenticate, async (req, res) => {
     };
 
     if (paymentIntent.status === 'succeeded') {
+      // 1. Mettre à jour le statut de la commande
+      if (orderId) {
+        const { Order, Invoice } = require('../../models');
+        
+        const order = await Order.findByPk(orderId);
+        if (order) {
+          await order.update({ status: 'confirmed' });
+          
+          // 2. Créer automatiquement une facture
+          const invoiceNumber = `INV-${Date.now()}-${orderId}`;
+          
+          await Invoice.create({
+            orderId: order.id,
+            invoiceNumber,
+            amount: order.total,
+            status: 'sent', // Facture envoyée automatiquement
+            issuedAt: new Date(),
+            dueAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 jours
+            paidAt: new Date() // Marquer comme payée immédiatement
+          });
+          
+          logger.info('Invoice auto-created after payment', {
+            orderId: order.id,
+            invoiceNumber,
+            amount: order.total
+          });
+        }
+      }
+
       logger.info('Payment confirmed', {
         paymentIntentId,
         userId: req.user.id,

@@ -229,6 +229,15 @@ export const api = {
     getById: (id: string) => apiClient.get(`/invoices/${id}`),
     updateStatus: (id: string, status: string) => 
       apiClient.patch(`/invoices/${id}/status`, { status })
+  },
+
+  // Paiements
+  payments: {
+    createIntent: (data: { amount: number; currency: string; orderId: number }) => 
+      apiClient.post('/payments/create-intent', data),
+    confirm: (data: { paymentIntentId: string; orderId?: number }) => 
+      apiClient.post('/payments/confirm', data),
+    getHistory: () => apiClient.get('/payments/history')
   }
 }
 
