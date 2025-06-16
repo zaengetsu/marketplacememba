@@ -190,19 +190,34 @@ const proceedToCheckout = async () => {
     console.log('✅ Commande créée:', order)
     console.log('💳 Intention de paiement créée:', paymentIntent)
 
-    // 2. Simulation du paiement (remplacez par Stripe Elements en vrai)
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    // 2. Rediriger vers la page de paiement Stripe
+    // En prod, vous intégreriez Stripe Elements ici
+    // Pour la demo, on simule une redirection vers une page de paiement
     
-    // 3. Confirmer le paiement
-    await orderStore.confirmPayment(paymentIntent.id, order.id)
+    const shouldProcessPayment = confirm(
+      `Commande créée avec succès!\n\n` +
+      `Numéro: #${order.id}\n` +
+      `Total: ${parseFloat(order.total.toString()).toFixed(2)}€\n\n` +
+      `Cliquez OK pour simuler le paiement Stripe\n` +
+      `(En prod, vous seriez redirigé vers Stripe)`
+    )
     
-    console.log('✅ Paiement confirmé! Commande:', order.id)
-    
-    // 4. Vider le panier et rediriger
-    cartStore.clearCart()
-    
-    // Rediriger vers la page de confirmation
-    router.push(`/order-confirmation/${order.id}`)
+    if (shouldProcessPayment) {
+      // 3. Simuler le retour de Stripe et confirmer le paiement
+      await new Promise(resolve => setTimeout(resolve, 2000)) // Simulation délai Stripe
+      
+      await orderStore.confirmPayment(paymentIntent.id, order.id)
+      
+      console.log('✅ Paiement confirmé! Commande:', order.id)
+      
+      // 4. Vider le panier et rediriger vers confirmation
+      cartStore.clearCart()
+      router.push(`/order-confirmation/${order.id}`)
+    } else {
+      // L'utilisateur a annulé - rediriger vers la commande en attente
+      console.log('❌ Paiement annulé - commande en attente')
+      router.push(`/orders`)
+    }
     
   } catch (error: any) {
     console.error('❌ Erreur lors du checkout:', error)

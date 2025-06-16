@@ -38,7 +38,7 @@
                 <span :class="getStatusClass(invoice.status)" class="px-3 py-1 rounded-full text-sm font-medium">
                   {{ getStatusText(invoice.status) }}
                 </span>
-                <span class="text-lg font-semibold">{{ invoice.amount.toFixed(2) }}€</span>
+                <span class="text-lg font-semibold">{{ parseFloat(invoice.amount.toString()).toFixed(2) }}€</span>
               </div>
             </div>
 
@@ -121,7 +121,7 @@
 
             <div>
               <h3 class="font-medium mb-2">Montant</h3>
-              <span class="text-xl font-semibold">{{ selectedInvoice.amount.toFixed(2) }}€</span>
+              <span class="text-xl font-semibold">{{ parseFloat(selectedInvoice.amount.toString()).toFixed(2) }}€</span>
             </div>
 
             <div>
@@ -142,8 +142,8 @@
             <div v-if="selectedInvoice.order">
               <h3 class="font-medium mb-2">Commande liée</h3>
               <p class="text-gray-600">
-                Commande #{{ selectedInvoice.order.id }} 
-                ({{ selectedInvoice.order.total.toFixed(2) }}€)
+                                 Commande #{{ selectedInvoice.order.id }} 
+                ({{ parseFloat(selectedInvoice.order.total.toString()).toFixed(2) }}€)
               </p>
             </div>
           </div>
