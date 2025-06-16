@@ -1,0 +1,129 @@
+version: '3.8'
+
+services:
+  # Base de données PostgreSQL (données principales)
+  postgres:
+    image: postgres:15
+    container_name: ecommerce-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+
+  # Base de données MongoDB (recherche et cache)
+  mongodb:
+    image: mongo:7.0
+    container_name: ecommerce-mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: ecommerce
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./backend/src/database/init:/docker-entrypoint-initdb.d
+    networks:
+      - ecommerce-network
+
+  # Base de données Redis pour les sessions et cache
+  redis:
+    image: redis:7.2-alpine
+    container_name: ecommerce-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ecommerce-network
+
+  # API Backend NodeJS
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ecommerce-backend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      # PostgreSQL (données principales)
+      DATABASE_URL: postgres://postgres:password123@postgres:5432/ecommerce
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ecommerce
+      DB_USER: postgres
+      DB_PASSWORD: password123
+      # MongoDB (recherche)
+      MONGODB_URI: mongodb://admin:password123@mongodb:27017/ecommerce?authSource=admin
+      # Redis (sessions)
+      REDIS_URL: redis://redis:6379
+      # JWT
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      JWT_EXPIRES_IN: 7d
+      SESSION_SECRET: your-super-secret-session-key-change-in-production
+      # Email
+      EMAIL_HOST: smtp.gmail.com
+      EMAIL_PORT: 587
+      EMAIL_USER: your-email@gmail.com
+      EMAIL_PASS: your-email-password
+      EMAIL_FROM: your-email@gmail.com
+      # Paiement
+      STRIPE_SECRET_KEY: sk_test_your_stripe_secret_key
+      PAYPAL_CLIENT_ID: your-paypal-client-id
+      PAYPAL_CLIENT_SECRET: your-paypal-client-secret
+      # Livraison
+      LAPOSTE_API_KEY: your-laposte-api-key
+      # Frontend
+      FRONTEND_URL: http://localhost:5173
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - postgres
+      - mongodb
+      - redis
+    networks:
+      - ecommerce-network
+    command: npm run dev
+
+  # Frontend VueJS
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ecommerce-frontend
+    restart: always
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:3000/api
+      VITE_STRIPE_PUBLIC_KEY: pk_test_your_stripe_public_key
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - ecommerce-network
+    command: npm run dev
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  redis_data:
+
+networks:
+  ecommerce-network:
+    driver: bridge 
