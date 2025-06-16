@@ -35,7 +35,7 @@
                 <span :class="getStatusClass(order.status)" class="px-3 py-1 rounded-full text-sm font-medium">
                   {{ getStatusText(order.status) }}
                 </span>
-                <span class="text-lg font-semibold">{{ order.total.toFixed(2) }}€</span>
+                <span class="text-lg font-semibold">{{ parseFloat(order.total.toString()).toFixed(2) }}€</span>
               </div>
             </div>
 
@@ -107,7 +107,7 @@
 
             <div>
               <h3 class="font-medium mb-2">Total</h3>
-              <span class="text-xl font-semibold">{{ selectedOrder.total.toFixed(2) }}€</span>
+              <span class="text-xl font-semibold">{{ parseFloat(selectedOrder.total.toString()).toFixed(2) }}€</span>
             </div>
 
             <div>

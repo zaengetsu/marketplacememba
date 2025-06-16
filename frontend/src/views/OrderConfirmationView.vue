@@ -34,7 +34,7 @@
               </div>
               <div>
                 <h3 class="font-medium mb-2">Total</h3>
-                <p class="text-xl font-semibold">{{ order.total.toFixed(2) }}€</p>
+                <p class="text-xl font-semibold">{{ parseFloat(order.total.toString()).toFixed(2) }}€</p>
               </div>
               <div>
                 <h3 class="font-medium mb-2">Date de commande</h3>
