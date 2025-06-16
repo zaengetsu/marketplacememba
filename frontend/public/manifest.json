@@ -1,0 +1,16 @@
+{
+  "name": "MambaFit E-Commerce",
+  "short_name": "MambaFit",
+  "description": "Application e-commerce pour produits de fitness",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ea580c",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+} 
