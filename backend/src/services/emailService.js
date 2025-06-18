@@ -28,11 +28,19 @@ class EmailService {
   async sendVerificationEmail(email, token, userData) {
     if (!this.isEnabled) return;
 
+    // Remplace l'URL par celle de ton frontend si besoin
+    const verificationUrl = `http://localhost:5173/?token=${token}`; // adapte l'URL si besoin
+
     const mailOptions = {
       from: process.env.MAIL_FROM,
       to: email,
       subject: 'Confirmation de votre adresse email',
-      html: `<p>Merci de vous être inscrit. Voici votre token de vérification : <b>${token}</b></p>`
+      html: `
+    <p>Merci de vous être inscrit.</p>
+    <p>Cliquez sur le lien ci-dessous pour activer votre compte :</p>
+    <p><a href="${verificationUrl}">Activer mon compte</a></p>
+    <p>Ou copiez ce lien dans votre navigateur :<br>${verificationUrl}</p>
+  `
     };
 
     try {

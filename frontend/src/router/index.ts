@@ -108,7 +108,7 @@ const router = createRouter({
       path: '/reset-password/:token',
       name: 'ResetPassword',
       component: () => import('@/views/ResetPassword.vue')
-    }
+    },
   ]
 })
 
