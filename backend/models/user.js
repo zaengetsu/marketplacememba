@@ -2,6 +2,7 @@
 const {
   Model
 } = require('sequelize');
+const crypto = require('crypto');
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -15,6 +16,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'userId',
         as: 'orders'
       });
+    }
+
+    generateEmailVerificationToken() {
+    return crypto.randomBytes(32).toString('hex');
     }
   }
   User.init({

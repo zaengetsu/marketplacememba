@@ -133,6 +133,31 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  // Après refreshUserProfile
+const forgotPassword = async (email: string) => {
+  try {
+    const response = await authAPI.forgotPassword(email)
+    if (!response.success) {
+      throw new Error(response.error || 'Erreur lors de la demande de réinitialisation')
+    }
+    return response
+  } catch (error) {
+    throw error
+  }
+}
+
+const resetPassword = async (token: string, password: string) => {
+  try {
+    const response = await authAPI.resetPassword(token, password, password)
+    if (!response.success) {
+      throw new Error(response.error || 'Erreur lors de la réinitialisation')
+    }
+    return response
+  } catch (error) {
+    throw error
+  }
+}
+
   return {
     user,
     token,
@@ -145,6 +170,8 @@ export const useAuthStore = defineStore('auth', () => {
     register,
     logout,
     checkAuth,
-    refreshUserProfile
+    refreshUserProfile,
+    forgotPassword,
+    resetPassword
   }
 }) 

@@ -3,7 +3,7 @@
     "username": "postgres",
     "password": "password123",
     "database": "ecommerce",
-    "host": "localhost",
+    "host": "postgres",
     "port": 5432,
     "dialect": "postgres",
     "logging": true

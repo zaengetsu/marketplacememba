@@ -113,7 +113,7 @@ app.use(helmet({
 
 // Configuration CORS
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: process.env.FRONTEND_URL || ['http://localhost:5173', 'http://localhost:5174'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
@@ -191,6 +191,7 @@ app.use('/api/alerts', alertRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/rgpd', rgpdRoutes);
 app.use('/api/webhooks', webhookRoutes);
+
 console.log('✅ Routes API configurées');
 
 // Route de santé

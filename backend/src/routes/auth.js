@@ -5,9 +5,9 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const { User } = require('../../models');
+const { User } = require('../../models'); // Assurez-vous que le modèle User est correctement importé
 const { authenticate } = require('../middlewares/auth');
-// const emailService = require('../services/emailService'); // À configurer plus tard
+const emailService = require('../services/emailService'); // À configurer plus tard
 const logger = require('../utils/logger');
 
 const router = express.Router();
@@ -39,23 +39,23 @@ const registerValidation = [
     .trim()
     .isLength({ min: 2, max: 50 })
     .withMessage('Le prénom doit contenir entre 2 et 50 caractères'),
-  
+
   body('lastName')
     .trim()
     .isLength({ min: 2, max: 50 })
     .withMessage('Le nom doit contenir entre 2 et 50 caractères'),
-  
+
   body('email')
     .isEmail()
     .normalizeEmail()
     .withMessage('Email invalide'),
-  
+
   body('password')
     .isLength({ min: 8 })
     .withMessage('Le mot de passe doit contenir au moins 8 caractères')
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
     .withMessage('Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre'),
-  
+
   body('confirmPassword')
     .custom((value, { req }) => {
       if (value !== req.body.password) {
@@ -63,7 +63,7 @@ const registerValidation = [
       }
       return true;
     }),
-  
+
   body('gdprConsent')
     .equals('true')
     .withMessage('Vous devez accepter les conditions générales et la politique de confidentialité')
@@ -74,70 +74,51 @@ const registerValidation = [
 // @access  Public
 router.post('/register', registerLimiter, registerValidation, async (req, res) => {
   try {
-    // Vérification des erreurs de validation
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        error: 'Données invalides',
-        details: errors.array()
-      });
+      return res.status(400).json({ success: false, errors: errors.array() });
     }
 
     const { firstName, lastName, email, password, gdprConsent } = req.body;
 
-    // Vérification si l'utilisateur existe déjà (Sequelize)
+    // Vérifie si l'utilisateur existe déjà
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        error: 'Un compte avec cet email existe déjà'
-      });
+      return res.status(400).json({ success: false, error: 'Email déjà utilisé.' });
     }
 
-    // Hashage du mot de passe
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    // Hash du mot de passe
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Création de l'utilisateur (Sequelize)
+    // Génération du token de vérification email
+    const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+
+    // Création de l'utilisateur (adapté pour Sequelize)
     const user = await User.create({
       firstName,
       lastName,
       email,
       password: hashedPassword,
-      // role utilise la valeur par défaut du modèle ('customer')
+      gdprConsent,
+      isEmailVerified: false,
       isActive: true,
-      isEmailVerified: false // En mode dev, on va le mettre à true pour simplifier
+      emailVerificationToken // Assure-toi que ce champ existe dans ton modèle et ta migration
     });
 
-    logger.info('User registered', {
-      userId: user.id,
-      email: user.email,
-      ip: req.ip
+    // Envoi de l'email de vérification
+    await emailService.sendVerificationEmail({
+      to: user.email,
+      subject: 'Confirmation de votre adresse email',
+      html: `<p>Merci de vous être inscrit. Voici votre token de vérification : <b>${emailVerificationToken}</b></p>`
     });
 
-    res.status(201).json({
-      success: true,
-      message: 'Inscription réussie. Vous pouvez maintenant vous connecter.',
-      data: {
-        user: {
-          id: user.id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          isEmailVerified: user.isEmailVerified
-        }
-      }
-    });
-
+    return res.status(201).json({ success: true, message: 'Utilisateur créé. Vérifiez votre email.' });
   } catch (error) {
     logger.error('Registration error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Erreur lors de l\'inscription'
-    });
+    return res.status(500).json({ success: false, error: 'Erreur serveur.' });
   }
 });
+
 
 // @desc    Connexion utilisateur
 // @route   POST /api/auth/login
@@ -168,6 +149,14 @@ router.post('/login', authLimiter, [
       });
     }
 
+    // Vérification que l'email est vérifié
+    if (!user.isEmailVerified) {
+      return res.status(401).json({
+        success: false,
+        error: 'Veuillez valider votre adresse email avant de vous connecter.'
+      });
+    }
+
     // Vérification du mot de passe
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
@@ -193,10 +182,10 @@ router.post('/login', authLimiter, [
 
     // Génération du token JWT
     const token = jwt.sign(
-      { 
-        userId: user.id, 
-        email: user.email, 
-        role: user.role 
+      {
+        userId: user.id,
+        email: user.email,
+        role: user.role
       },
       process.env.JWT_SECRET || 'your-secret-key',
       { expiresIn: '7d' }
@@ -296,33 +285,42 @@ router.post('/forgot-password', [
     }
 
     const { email } = req.body;
-
-    // Recherche de l'utilisateur (Sequelize)
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
-      // Ne pas révéler si l'email existe ou non
-      return res.json({
+      // Ne pas révéler l'existence d'un compte
+      return res.status(200).json({
         success: true,
         message: 'Si un compte avec cet email existe, un lien de réinitialisation a été envoyé.'
       });
     }
 
-    // TODO: Générer un token de réinitialisation et envoyer l'email
-    // Pour le moment, on simule juste une réponse positive
-    logger.info('Password reset requested', {
+    const { token, hashed, expires } = generatePasswordResetToken();
+    user.passwordResetToken = hashed;
+    user.passwordResetExpires = expires;
+    await user.save();
+
+    const resetUrl = `http://localhost:5173/reset-password/${token}`;
+
+    await emailService.sendPasswordReset(
+      user.email,
+      user.firstName || user.name || '',
+      token
+    );
+
+    logger?.info?.('Password reset requested', {
       userId: user.id,
       email: user.email,
       ip: req.ip
     });
 
-    res.json({
+    return res.status(200).json({
       success: true,
       message: 'Si un compte avec cet email existe, un lien de réinitialisation a été envoyé.'
     });
 
   } catch (error) {
-    logger.error('Password reset request error:', error);
+    logger?.error?.('Password reset request error:', error);
     res.status(500).json({
       success: false,
       error: 'Erreur lors de la demande de réinitialisation'
@@ -392,5 +390,34 @@ router.post('/renew-password', authenticate, [
     });
   }
 });
+
+
+// @desc    reinitialisation du mot de passe
+// @route   POST /api/auth/reset-password/:token
+// @access  Public
+router.post('/reset-password/:token', async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    return res.status(400).json({ error: 'Lien invalide ou expiré' });
+  }
+
+  user.password = password;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+
+  await user.save();
+
+  res.json({ success: true, message: 'Mot de passe réinitialisé avec succès' });
+});
+
 
 module.exports = router; 

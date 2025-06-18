@@ -4,6 +4,7 @@ const { Order, User } = require('../../models');
 const { authenticate } = require('../middlewares/auth');
 const { requirePermission } = require('../middlewares/roleAuth');
 const logger = require('../utils/logger');
+const emailService = require('../services/emailService');
 
 // GET /api/orders - Commandes de l'utilisateur connecté
 router.get('/', authenticate, async (req, res) => {
@@ -56,7 +57,7 @@ router.get('/:id', authenticate, async (req, res) => {
     const order = await Order.findOne({
       where: { 
         id: req.params.id,
-        userId: req.user.id  // L'utilisateur ne peut voir que ses commandes
+        userId: req.user.id
       }
     });
 
@@ -81,7 +82,7 @@ router.get('/:id', authenticate, async (req, res) => {
   }
 });
 
-// POST /api/orders - Créer une commande
+// POST /api/orders - Créer une commande + envoi email
 router.post('/', authenticate, async (req, res) => {
   try {
     const {
@@ -91,7 +92,6 @@ router.post('/', authenticate, async (req, res) => {
       items = []
     } = req.body;
 
-    // Validation basique
     if (!total || !shippingAddress || items.length === 0) {
       return res.status(400).json({
         success: false,
@@ -109,9 +109,17 @@ router.post('/', authenticate, async (req, res) => {
 
     logger.info(`Order created: ${order.id}`, { userId: req.user.id });
 
+    // Envoi email confirmation
+    try {
+      await emailService.sendOrderConfirmation(req.user.email, order, req.user);
+      logger.info(`Email confirmation envoyé à ${req.user.email}`);
+    } catch (emailErr) {
+      logger.error('Erreur envoi email confirmation commande :', emailErr);
+    }
+
     res.status(201).json({
       success: true,
-      message: 'Commande créée avec succès',
+      message: 'Commande créée avec succès, email envoyé',
       data: order
     });
 
@@ -181,4 +189,4 @@ router.get('/admin/all', authenticate, requirePermission('orders:read'), async (
   }
 });
 
-module.exports = router; 
+module.exports = router;
