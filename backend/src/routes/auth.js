@@ -4,6 +4,7 @@ const { body, validationResult } = require('express-validator');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { Op } = require('sequelize');
 
 const { User } = require('../../models'); // Assurez-vous que le modèle User est correctement importé
 const { authenticate } = require('../middlewares/auth');
@@ -273,62 +274,31 @@ router.get('/me', authenticate, (req, res) => {
 // @desc    Demande de réinitialisation de mot de passe
 // @route   POST /api/auth/forgot-password
 // @access  Public
-router.post('/forgot-password', [
-  body('email').isEmail().normalizeEmail().withMessage('Email invalide')
-], async (req, res) => {
+router.post('/forgot-password', async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        error: 'Email invalide'
-      });
-    }
-
     const { email } = req.body;
     const user = await User.findOne({ where: { email } });
-
     if (!user) {
-      // Ne pas révéler l'existence d'un compte
-      return res.status(200).json({
-        success: true,
-        message: 'Si un compte avec cet email existe, un lien de réinitialisation a été envoyé.'
-      });
+      return res.status(400).json({ success: false, error: 'Aucun compte trouvé avec cet email.' });
     }
 
-    const { token, hashed, expires } = generatePasswordResetToken();
-    user.passwordResetToken = hashed;
-    user.passwordResetExpires = expires;
+    // Génère un token de réinitialisation
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    user.passwordResetToken = resetToken;
+    user.passwordResetExpires = Date.now() + 3600000; // 1h
+
     await user.save();
 
-    const resetUrl = `http://localhost:5173/reset-password/${token}`;
+    // Envoie l'email avec le lien de réinitialisation
+    const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+    await emailService.sendPasswordResetEmail(user.email, resetToken, user);
 
-    await emailService.sendPasswordReset(
-      user.email,
-      user.firstName || user.name || '',
-      token
-    );
-
-    logger?.info?.('Password reset requested', {
-      userId: user.id,
-      email: user.email,
-      ip: req.ip
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: 'Si un compte avec cet email existe, un lien de réinitialisation a été envoyé.'
-    });
-
+    res.json({ success: true, message: 'Un email de réinitialisation a été envoyé.' });
   } catch (error) {
-    logger?.error?.('Password reset request error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Erreur lors de la demande de réinitialisation'
-    });
+    logger.error('Password reset request error:', error);
+    res.status(500).json({ success: false, error: 'Erreur serveur.' });
   }
 });
-
 // @desc    Renouvellement de mot de passe
 // @route   POST /api/auth/renew-password
 // @access  Private
@@ -400,24 +370,24 @@ router.post('/reset-password/:token', async (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
 
-  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-
   const user = await User.findOne({
-    passwordResetToken: hashedToken,
-    passwordResetExpires: { $gt: Date.now() }
+    where: {
+      passwordResetToken: token,
+      passwordResetExpires: { [Op.gt]: new Date() }
+    }
   });
 
   if (!user) {
-    return res.status(400).json({ error: 'Lien invalide ou expiré' });
+    return res.status(400).json({ success: false, error: 'Lien invalide ou expiré.' });
   }
 
-  user.password = password;
-  user.passwordResetToken = undefined;
-  user.passwordResetExpires = undefined;
-
+  const hashedPassword = await bcrypt.hash(password, 10);
+  user.password = hashedPassword;
+  user.passwordResetToken = null;
+  user.passwordResetExpires = null;
   await user.save();
 
-  res.json({ success: true, message: 'Mot de passe réinitialisé avec succès' });
+  res.json({ success: true, message: 'Mot de passe modifié.' });
 });
 
 // @desc    Vérification de l'email

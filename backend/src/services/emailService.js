@@ -52,9 +52,30 @@ class EmailService {
   }
 
   async sendPasswordResetEmail(email, token, userData) {
-    if (!this.isEnabled) return;
-    // À implémenter si besoin
+  if (!this.isEnabled) return;
+
+  const resetUrl = `http://localhost:5173/reset-password/${token}`;
+
+  const mailOptions = {
+    from: process.env.MAIL_FROM,
+    to: email,
+    subject: 'Réinitialisation de votre mot de passe',
+    html: `
+      <p>Bonjour,</p>
+      <p>Vous avez demandé à réinitialiser votre mot de passe.</p>
+      <p>Cliquez sur le lien ci-dessous pour définir un nouveau mot de passe :</p>
+      <p><a href="${resetUrl}">Réinitialiser mon mot de passe</a></p>
+      <p>Si vous n'avez pas demandé cette action, ignorez simplement ce message.</p>
+    `
+  };
+
+  try {
+    await this.transporter.sendMail(mailOptions);
+    logger.info(`📧 Email de réinitialisation envoyé à ${email}`);
+  } catch (error) {
+    logger.error('❌ Erreur lors de l’envoi de l’email de réinitialisation :', error);
   }
+}
 
   async sendAccountLockedEmail(email, userData) {
     if (!this.isEnabled) return;

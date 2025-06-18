@@ -1,49 +1,55 @@
-<!-- src/views/ResetPassword.vue -->
 <template>
-  <div class="reset-password">
-    <h1>Réinitialiser le mot de passe</h1>
-    <form @submit.prevent="submit">
-      <input v-model="password" type="password" placeholder="Nouveau mot de passe" required />
-      <button type="submit">Changer le mot de passe</button>
+  <div class="container mx-auto py-16 text-center">
+    <form v-if="!success" @submit.prevent="handleReset" class="max-w-sm mx-auto bg-white p-6 rounded shadow">
+      <h2 class="text-xl font-bold mb-4">Réinitialiser mon mot de passe</h2>
+      <input
+        v-model="password"
+        type="password"
+        placeholder="Nouveau mot de passe"
+        class="border rounded px-3 py-2 w-full mb-4"
+        required
+      />
+      <button type="submit" class="btn btn-primary w-full">Réinitialiser</button>
+      <div v-if="error" class="text-red-600 mt-2">{{ error }}</div>
     </form>
-    <p v-if="message">{{ message }}</p>
-    <p v-if="error" class="error">{{ error }}</p>
+    <div v-else class="text-green-600 text-xl font-bold">
+      ✅ Mot de passe modifié avec succès !<br>
+      <span>Redirection vers l'accueil...</span>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
+import { ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
-const route = useRoute();
-const router = useRouter();
-const password = ref('');
-const message = ref('');
-const error = ref('');
+const route = useRoute()
+const router = useRouter()
+const password = ref('')
+const error = ref('')
+const success = ref(false)
 
-const token = route.params.token as string;
-const auth = useAuthStore();
+const token = route.params.token as string
 
-const submit = async () => {
-  message.value = '';
-  error.value = '';
+const handleReset = async () => {
+  error.value = ''
   try {
-    const res = await auth.resetPassword(token, password.value);
-    message.value = res.message;
-    setTimeout(() => router.push('/login'), 2000);
-  } catch (err: any) {
-    error.value = err.message || 'Erreur';
+    const res = await fetch(`/api/auth/reset-password/${token}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: password.value })
+    })
+    const data = await res.json()
+    if (data.success) {
+      success.value = true
+      setTimeout(() => {
+        router.push('/')
+      }, 2000) // Redirige après 2 secondes
+    } else {
+      error.value = data.error || 'Erreur lors de la réinitialisation.'
+    }
+  } catch {
+    error.value = 'Erreur serveur.'
   }
-};
+}
 </script>
-
-<style scoped>
-.reset-password {
-  max-width: 400px;
-  margin: auto;
-}
-.error {
-  color: red;
-}
-</style>
