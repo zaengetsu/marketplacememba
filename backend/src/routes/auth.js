@@ -342,6 +342,9 @@ router.post('/renew-password', authenticate, [
     // Mise à jour du mot de passe
     await user.update({ password: hashedPassword });
 
+    // Envoi de l'email de notification
+    await emailService.sendPasswordChangedEmail(user.email, user);
+
     logger.info('Password renewed', {
       userId: user.id,
       email: user.email,

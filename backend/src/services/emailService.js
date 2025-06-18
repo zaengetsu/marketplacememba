@@ -179,6 +179,28 @@ class EmailService {
       logger.error('❌ Erreur lors de l’envoi de l’email d’expédition :', error);
     }
   }
+
+  async sendPasswordChangedEmail(email, userData) {
+  if (!this.isEnabled) return;
+
+  const mailOptions = {
+    from: process.env.MAIL_FROM,
+    to: email,
+    subject: 'Votre mot de passe a été modifié',
+    html: `
+      <p>Bonjour,</p>
+      <p>Votre mot de passe vient d'être modifié.</p>
+      <p>Si ce n'est pas vous, <a href="http://localhost:5173/forgot-password">cliquez ici pour réinitialiser votre mot de passe</a>.</p>
+    `
+  };
+
+  try {
+    await this.transporter.sendMail(mailOptions);
+    logger.info(`📧 Email de notification de changement de mot de passe envoyé à ${email}`);
+  } catch (error) {
+    logger.error('❌ Erreur lors de l’envoi de l’email de notification de changement de mot de passe :', error);
+  }
+}
 }
 
 module.exports = new EmailService();
