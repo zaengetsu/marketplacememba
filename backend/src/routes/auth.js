@@ -420,5 +420,23 @@ router.post('/reset-password/:token', async (req, res) => {
   res.json({ success: true, message: 'Mot de passe réinitialisé avec succès' });
 });
 
+// @desc    Vérification de l'email
+// @route   GET /api/auth/verify-email
+// @access  Public
+router.post('/verify-email', async (req, res) => {
+  const { token } = req.body;
+  if (!token) {
+    return res.status(400).json({ success: false, error: 'Token manquant.' });
+  }
+  const user = await User.findOne({ where: { emailVerificationToken: token } });
+  if (!user) {
+    return res.status(400).json({ success: false, error: 'Token invalide.' });
+  }
+  user.isEmailVerified = true;
+  user.emailVerificationToken = null;
+  await user.save();
+  res.json({ success: true, message: 'Email vérifié !' });
+});
+
 
 module.exports = router; 

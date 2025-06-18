@@ -29,7 +29,7 @@ class EmailService {
     if (!this.isEnabled) return;
 
     // Remplace l'URL par celle de ton frontend si besoin
-    const verificationUrl = `http://localhost:5173/?token=${token}`; // adapte l'URL si besoin
+    const verificationUrl = `http://localhost:5173/verify-email?token=${token}`; // adapte l'URL si besoin
 
     const mailOptions = {
       from: process.env.MAIL_FROM,
