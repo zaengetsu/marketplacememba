@@ -1,10 +1,10 @@
 require('dotenv').config();
-const transporter = require('../utils/mailer'); 
+const transporter = require('../utils/mailer');
 const logger = require('../utils/logger');
 
 class EmailService {
   constructor() {
-    this.isEnabled = !!(process.env.EMAIL_USER && process.env.EMAIL_PASS);
+    this.isEnabled = !!(process.env.MAIL_USER && process.env.MAIL_PASSWORD);
 
     if (!this.isEnabled) {
       console.log('📧 Service Email désactivé - Pas de configuration SMTP');
@@ -26,22 +26,22 @@ class EmailService {
   }
 
   async sendVerificationEmail(email, token, userData) {
-  if (!this.isEnabled) return;
+    if (!this.isEnabled) return;
 
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: 'Confirmation de votre adresse email',
-    html: `<p>Merci de vous être inscrit. Voici votre token de vérification : <b>${token}</b></p>`
-  };
+    const mailOptions = {
+      from: process.env.MAIL_FROM,
+      to: email,
+      subject: 'Confirmation de votre adresse email',
+      html: `<p>Merci de vous être inscrit. Voici votre token de vérification : <b>${token}</b></p>`
+    };
 
-  try {
-    await this.transporter.sendMail(mailOptions);
-    logger.info(`📧 Email de vérification envoyé à ${email}`);
-  } catch (error) {
-    logger.error('❌ Erreur lors de l’envoi de l’email de vérification :', error);
+    try {
+      await this.transporter.sendMail(mailOptions);
+      logger.info(`📧 Email de vérification envoyé à ${email}`);
+    } catch (error) {
+      logger.error('❌ Erreur lors de l’envoi de l’email de vérification :', error);
+    }
   }
-}
 
   async sendPasswordResetEmail(email, token, userData) {
     if (!this.isEnabled) return;
@@ -72,7 +72,7 @@ class EmailService {
     if (!this.isEnabled) return;
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: process.env.MAIL_USER,
       to: email,
       subject: `Confirmation de votre commande #${order.id}`,
       text: `Bonjour ${userData?.name || 'client'},\n\nMerci pour votre commande ! Voici les détails :\n\n- Numéro de commande : ${order.id}\n- Montant total : ${order.total} €\n\nCordialement,\nL'équipe Marketplace`,
@@ -100,7 +100,7 @@ class EmailService {
     if (!this.isEnabled) return;
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: process.env.MAIL_USER,
       to: userEmail,
       subject: 'Bienvenue sur Marketplace !',
       text: `Bonjour ${userName || ''},\n\nBienvenue sur notre marketplace !\nNous sommes ravis de vous compter parmi nous.\n\nCordialement,\nL'équipe Marketplace`,
@@ -119,7 +119,7 @@ class EmailService {
 
     const resetUrl = `http://localhost:5173/reset-password?token=${token}`;
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: process.env.MAIL_USER,
       to: userEmail,
       subject: 'Réinitialisation de votre mot de passe',
       text: `Bonjour ${userName || ''},\n\nVoici le lien pour réinitialiser votre mot de passe :\n${resetUrl}\n\nCe lien est valable 1 heure.\n\nCordialement,\nL'équipe Marketplace`,
@@ -137,7 +137,7 @@ class EmailService {
     if (!this.isEnabled) return;
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: process.env.MAIL_USER,
       to: userEmail,
       subject: `Votre commande #${orderNumber} a été expédiée`,
       text: `Bonjour ${userName || ''},\n\nVotre commande #${orderNumber} a été expédiée.\nNuméro de suivi : ${trackingNumber}\n\nCordialement,\nL'équipe Marketplace`,

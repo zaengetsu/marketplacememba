@@ -106,11 +106,12 @@ router.post('/register', registerLimiter, registerValidation, async (req, res) =
     });
 
     // Envoi de l'email de vérification
-    await emailService.sendVerificationEmail({
-      to: user.email,
-      subject: 'Confirmation de votre adresse email',
-      html: `<p>Merci de vous être inscrit. Voici votre token de vérification : <b>${emailVerificationToken}</b></p>`
-    });
+    logger.info('Appel de sendVerificationEmail pour', user.email);
+    await emailService.sendVerificationEmail(
+      user.email,
+      emailVerificationToken,
+      user
+    );
 
     return res.status(201).json({ success: true, message: 'Utilisateur créé. Vérifiez votre email.' });
   } catch (error) {

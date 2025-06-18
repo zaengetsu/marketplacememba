@@ -2231,3 +2231,193 @@ service":"ecommerce-api","timestamp":"2025-06-18 09:35:51","version":"1.0.0"}
 {"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 11:50:19","version":"1.0.0"}
 {"code":"EAUTH","command":"AUTH PLAIN","level":"error","message":"❌ Erreur lors de la vérification SMTP : Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3a568b089b5sm16487851f8f.48 - gsmtp","response":"535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3a568b089b5sm16487851f8f.48 - gsmtp","responseCode":535,"service":"ecommerce-api","stack":"Error: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials ffacd0b85a97d-3a568b089b5sm16487851f8f.48 - gsmtp\n    at SMTPConnection._formatError (/app/node_modules/nodemailer/lib/smtp-connection/index.js:809:19)\n    at SMTPConnection._actionAUTHComplete (/app/node_modules/nodemailer/lib/smtp-connection/index.js:1588:34)\n    at SMTPConnection.<anonymous> (/app/node_modules/nodemailer/lib/smtp-connection/index.js:556:26)\n    at SMTPConnection._processResponse (/app/node_modules/nodemailer/lib/smtp-connection/index.js:993:20)\n    at SMTPConnection._onData (/app/node_modules/nodemailer/lib/smtp-connection/index.js:774:14)\n    at SMTPConnection._onSocketData (/app/node_modules/nodemailer/lib/smtp-connection/index.js:195:44)\n    at TLSSocket.emit (node:events:517:28)\n    at addChunk (node:internal/streams/readable:368:12)\n    at readableAddChunk (node:internal/streams/readable:341:9)\n    at Readable.push (node:internal/streams/readable:278:10)","timestamp":"2025-06-18 11:50:19","version":"1.0.0"}
 {"level":"info","message":"::ffff:192.168.65.1 - - [18/Jun/2025:11:50:28 +0000] \"POST /api/auth/login HTTP/1.1\" 401 89 \"http://localhost:5173/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0\"","service":"ecommerce-api","timestamp":"2025-06-18 11:50:28","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:21:32","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:21:32","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:21:32","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:21:32","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:21:32","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:21:32","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:21:32","version":"1.0.0"}
+{"code":"EAUTH","command":"AUTH PLAIN","level":"error","message":"❌ Erreur lors de la vérification SMTP : Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-45359c1772csm13222665e9.0 - gsmtp","response":"535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-45359c1772csm13222665e9.0 - gsmtp","responseCode":535,"service":"ecommerce-api","stack":"Error: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5b1f17b1804b1-45359c1772csm13222665e9.0 - gsmtp\n    at SMTPConnection._formatError (/app/node_modules/nodemailer/lib/smtp-connection/index.js:809:19)\n    at SMTPConnection._actionAUTHComplete (/app/node_modules/nodemailer/lib/smtp-connection/index.js:1588:34)\n    at SMTPConnection.<anonymous> (/app/node_modules/nodemailer/lib/smtp-connection/index.js:556:26)\n    at SMTPConnection._processResponse (/app/node_modules/nodemailer/lib/smtp-connection/index.js:993:20)\n    at SMTPConnection._onData (/app/node_modules/nodemailer/lib/smtp-connection/index.js:774:14)\n    at SMTPConnection._onSocketData (/app/node_modules/nodemailer/lib/smtp-connection/index.js:195:44)\n    at TLSSocket.emit (node:events:517:28)\n    at addChunk (node:internal/streams/readable:368:12)\n    at readableAddChunk (node:internal/streams/readable:341:9)\n    at Readable.push (node:internal/streams/readable:278:10)","timestamp":"2025-06-18 12:21:32","version":"1.0.0"}
+{"level":"info","message":"Email service disabled - no SMTP configuration","service":"ecommerce-api","timestamp":"2025-06-18 12:21:40","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:21:40","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:21:40","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:21:40","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:21:40","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:21:40","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:21:40","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:21:40","version":"1.0.0"}
+{"level":"info","message":"Email service disabled - no SMTP configuration","service":"ecommerce-api","timestamp":"2025-06-18 12:21:59","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:21:59","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:21:59","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:21:59","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:21:59","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:21:59","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:21:59","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:21:59","version":"1.0.0"}
+{"level":"info","message":"Email service disabled - no SMTP configuration","service":"ecommerce-api","timestamp":"2025-06-18 12:22:06","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:22:06","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:22:06","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:22:06","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:22:06","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:22:06","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:22:06","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:22:06","version":"1.0.0"}
+{"level":"info","message":"Email service disabled - no SMTP configuration","service":"ecommerce-api","timestamp":"2025-06-18 12:22:11","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:22:11","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:22:12","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:22:12","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:22:12","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:22:12","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:22:12","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:22:12","version":"1.0.0"}
+{"level":"info","message":"Email service disabled - no SMTP configuration","service":"ecommerce-api","timestamp":"2025-06-18 12:22:15","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:22:15","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:22:15","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:22:15","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:22:15","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:22:15","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:22:15","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:22:15","version":"1.0.0"}
+{"level":"info","message":"Email service disabled - no SMTP configuration","service":"ecommerce-api","timestamp":"2025-06-18 12:22:18","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:22:18","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:22:18","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:22:18","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:22:18","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:22:18","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:22:18","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:22:18","version":"1.0.0"}
+{"level":"info","message":"Email service disabled - no SMTP configuration","service":"ecommerce-api","timestamp":"2025-06-18 12:22:59","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:23:00","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:23:00","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:23:00","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:23:00","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:23:00","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:23:00","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:23:00","version":"1.0.0"}
+{"level":"info","message":"Email service disabled - no SMTP configuration","service":"ecommerce-api","timestamp":"2025-06-18 12:23:05","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:23:05","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:23:05","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:23:05","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:23:05","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:23:05","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:23:05","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:23:05","version":"1.0.0"}
+{"level":"info","message":"Email service disabled - no SMTP configuration","service":"ecommerce-api","timestamp":"2025-06-18 12:23:08","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:23:08","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:23:08","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:23:08","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:23:08","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:23:08","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:23:08","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:23:08","version":"1.0.0"}
+{"level":"info","message":"Email service disabled - no SMTP configuration","service":"ecommerce-api","timestamp":"2025-06-18 12:23:11","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:23:11","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:23:11","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:23:11","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:23:11","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:23:11","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:23:11","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:23:11","version":"1.0.0"}
+{"level":"info","message":"Email service disabled - no SMTP configuration","service":"ecommerce-api","timestamp":"2025-06-18 12:23:13","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:23:13","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:23:13","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:23:13","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:23:13","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:23:13","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:23:13","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:23:13","version":"1.0.0"}
+{"level":"info","message":"Email service disabled - no SMTP configuration","service":"ecommerce-api","timestamp":"2025-06-18 12:23:48","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:23:48","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:23:48","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:23:48","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:23:48","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:23:48","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:23:48","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:23:48","version":"1.0.0"}
+{"level":"info","message":"Email service disabled - no SMTP configuration","service":"ecommerce-api","timestamp":"2025-06-18 12:25:16","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:25:16","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:25:16","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:25:16","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:25:16","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:25:16","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:25:16","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:25:16","version":"1.0.0"}
+{"level":"info","message":"::ffff:192.168.65.1 - - [18/Jun/2025:12:25:18 +0000] \"POST /api/auth/register HTTP/1.1\" 201 71 \"http://localhost:5173/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0\"","service":"ecommerce-api","timestamp":"2025-06-18 12:25:18","version":"1.0.0"}
+{"level":"info","message":"::ffff:192.168.65.1 - - [18/Jun/2025:12:26:31 +0000] \"POST /api/auth/login HTTP/1.1\" 401 89 \"http://localhost:5173/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0\"","service":"ecommerce-api","timestamp":"2025-06-18 12:26:31","version":"1.0.0"}
+{"level":"info","message":"::ffff:192.168.65.1 - - [18/Jun/2025:12:30:20 +0000] \"POST /api/auth/register HTTP/1.1\" 201 71 \"http://localhost:5173/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0\"","service":"ecommerce-api","timestamp":"2025-06-18 12:30:20","version":"1.0.0"}
+{"level":"info","message":"Email service disabled - no SMTP configuration","service":"ecommerce-api","timestamp":"2025-06-18 12:32:39","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:32:40","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:32:40","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:32:40","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:32:40","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:32:40","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:32:40","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:32:40","version":"1.0.0"}
+{"level":"info","message":"Email service disabled - no SMTP configuration","service":"ecommerce-api","timestamp":"2025-06-18 12:32:41","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:32:41","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:32:41","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:32:41","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:32:41","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:32:41","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:32:41","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:32:41","version":"1.0.0"}
+{"level":"info","message":"::ffff:192.168.65.1 - - [18/Jun/2025:12:33:15 +0000] \"POST /api/auth/register HTTP/1.1\" 201 71 \"http://localhost:5173/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0\"","service":"ecommerce-api","timestamp":"2025-06-18 12:33:15","version":"1.0.0"}
+{"level":"info","message":"Email service disabled - no SMTP configuration","service":"ecommerce-api","timestamp":"2025-06-18 12:46:10","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:46:10","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:46:10","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:46:10","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:46:10","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:46:10","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:46:10","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:46:10","version":"1.0.0"}
+{"level":"info","message":"::ffff:192.168.65.1 - - [18/Jun/2025:12:46:19 +0000] \"GET /api/products?limit=8&sortBy=createdAt&sortOrder=desc HTTP/1.1\" 304 - \"http://localhost:5173/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0\"","service":"ecommerce-api","timestamp":"2025-06-18 12:46:19","version":"1.0.0"}
+{"level":"info","message":"::ffff:192.168.65.1 - - [18/Jun/2025:12:46:32 +0000] \"POST /api/auth/register HTTP/1.1\" 201 71 \"http://localhost:5173/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36 OPR/119.0.0.0\"","service":"ecommerce-api","timestamp":"2025-06-18 12:46:32","version":"1.0.0"}
+{"level":"info","message":"Email service disabled - no SMTP configuration","service":"ecommerce-api","timestamp":"2025-06-18 12:51:57","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:51:58","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:51:58","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:51:58","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:51:58","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:51:58","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:51:58","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:51:58","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:54:02","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:54:02","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:54:02","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:54:02","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:54:02","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:54:02","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:54:02","version":"1.0.0"}
+{"code":"EAUTH","command":"API","level":"error","message":"❌ Erreur lors de la vérification SMTP : Missing credentials for \"PLAIN\"","service":"ecommerce-api","stack":"Error: Missing credentials for \"PLAIN\"\n    at SMTPConnection._formatError (/app/node_modules/nodemailer/lib/smtp-connection/index.js:809:19)\n    at SMTPConnection.login (/app/node_modules/nodemailer/lib/smtp-connection/index.js:454:38)\n    at /app/node_modules/nodemailer/lib/smtp-transport/index.js:375:32\n    at SMTPConnection.<anonymous> (/app/node_modules/nodemailer/lib/smtp-connection/index.js:215:17)\n    at Object.onceWrapper (node:events:631:28)\n    at SMTPConnection.emit (node:events:517:28)\n    at SMTPConnection._actionEHLO (/app/node_modules/nodemailer/lib/smtp-connection/index.js:1371:14)\n    at SMTPConnection._processResponse (/app/node_modules/nodemailer/lib/smtp-connection/index.js:993:20)\n    at SMTPConnection._onData (/app/node_modules/nodemailer/lib/smtp-connection/index.js:774:14)\n    at SMTPConnection._onSocketData (/app/node_modules/nodemailer/lib/smtp-connection/index.js:195:44)","timestamp":"2025-06-18 12:54:02","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:54:14","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:54:14","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:54:14","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:54:14","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:54:14","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:54:14","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:54:14","version":"1.0.0"}
+{"code":"EAUTH","command":"API","level":"error","message":"❌ Erreur lors de la vérification SMTP : Missing credentials for \"PLAIN\"","service":"ecommerce-api","stack":"Error: Missing credentials for \"PLAIN\"\n    at SMTPConnection._formatError (/app/node_modules/nodemailer/lib/smtp-connection/index.js:809:19)\n    at SMTPConnection.login (/app/node_modules/nodemailer/lib/smtp-connection/index.js:454:38)\n    at /app/node_modules/nodemailer/lib/smtp-transport/index.js:375:32\n    at SMTPConnection.<anonymous> (/app/node_modules/nodemailer/lib/smtp-connection/index.js:215:17)\n    at Object.onceWrapper (node:events:631:28)\n    at SMTPConnection.emit (node:events:517:28)\n    at SMTPConnection._actionEHLO (/app/node_modules/nodemailer/lib/smtp-connection/index.js:1371:14)\n    at SMTPConnection._processResponse (/app/node_modules/nodemailer/lib/smtp-connection/index.js:993:20)\n    at SMTPConnection._onData (/app/node_modules/nodemailer/lib/smtp-connection/index.js:774:14)\n    at SMTPConnection._onSocketData (/app/node_modules/nodemailer/lib/smtp-connection/index.js:195:44)","timestamp":"2025-06-18 12:54:15","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:54:16","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:54:16","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:54:16","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:54:16","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:54:16","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:54:16","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:54:16","version":"1.0.0"}
+{"code":"EAUTH","command":"API","level":"error","message":"❌ Erreur lors de la vérification SMTP : Missing credentials for \"PLAIN\"","service":"ecommerce-api","stack":"Error: Missing credentials for \"PLAIN\"\n    at SMTPConnection._formatError (/app/node_modules/nodemailer/lib/smtp-connection/index.js:809:19)\n    at SMTPConnection.login (/app/node_modules/nodemailer/lib/smtp-connection/index.js:454:38)\n    at /app/node_modules/nodemailer/lib/smtp-transport/index.js:375:32\n    at SMTPConnection.<anonymous> (/app/node_modules/nodemailer/lib/smtp-connection/index.js:215:17)\n    at Object.onceWrapper (node:events:631:28)\n    at SMTPConnection.emit (node:events:517:28)\n    at SMTPConnection._actionEHLO (/app/node_modules/nodemailer/lib/smtp-connection/index.js:1371:14)\n    at SMTPConnection._processResponse (/app/node_modules/nodemailer/lib/smtp-connection/index.js:993:20)\n    at SMTPConnection._onData (/app/node_modules/nodemailer/lib/smtp-connection/index.js:774:14)\n    at SMTPConnection._onSocketData (/app/node_modules/nodemailer/lib/smtp-connection/index.js:195:44)","timestamp":"2025-06-18 12:54:16","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:54:36","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:54:36","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:54:36","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:54:36","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:54:36","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:54:36","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:54:36","version":"1.0.0"}
+{"level":"info","message":"✅ Connexion au service SMTP vérifiée","service":"ecommerce-api","timestamp":"2025-06-18 12:54:36","version":"1.0.0"}
+{"level":"warn","message":"Using memory store for sessions (not recommended for production)","service":"ecommerce-api","timestamp":"2025-06-18 12:55:36","version":"1.0.0"}
+{"level":"info","message":"🚀 Serveur démarré sur le port 3000","service":"ecommerce-api","timestamp":"2025-06-18 12:55:36","version":"1.0.0"}
+{"level":"info","message":"🌍 Environnement: development","service":"ecommerce-api","timestamp":"2025-06-18 12:55:36","version":"1.0.0"}
+{"level":"info","message":"📊 API disponible sur http://localhost:3000/api","service":"ecommerce-api","timestamp":"2025-06-18 12:55:36","version":"1.0.0"}
+{"level":"info","message":"Redis connected successfully","service":"ecommerce-api","timestamp":"2025-06-18 12:55:36","version":"1.0.0"}
+{"level":"info","message":"PostgreSQL Connected: postgres:5432/ecommerce","service":"ecommerce-api","timestamp":"2025-06-18 12:55:36","version":"1.0.0"}
+{"level":"info","message":"Database synchronized","service":"ecommerce-api","timestamp":"2025-06-18 12:55:36","version":"1.0.0"}
+{"level":"info","message":"✅ Connexion au service SMTP vérifiée","service":"ecommerce-api","timestamp":"2025-06-18 12:55:36","version":"1.0.0"}
