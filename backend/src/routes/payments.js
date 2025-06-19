@@ -4,6 +4,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { authenticate } = require('../middlewares/auth');
 const { Order, OrderItem, Product } = require('../../models');
 const logger = require('../utils/logger');
+const generateInvoicePDF = require('../utils/invoicePdf')
 
 
 // POST /api/payments/create-intent - Créer une intention de paiement Stripe
@@ -95,17 +96,20 @@ router.post('/confirm', authenticate, async (req, res) => {
             paidAt: new Date()
           });
 
+          // Récupère l'utilisateur
+          const user = await User.findByPk(order.userId);
+          if (user) {
+            // Génère le PDF de la facture
+            const invoicePath = await generateInvoicePDF(order, invoice, user);
+            // Envoie l'email de confirmation avec la facture en pièce jointe
+            await emailService.sendOrderConfirmation(user.email, order, user, invoicePath);
+          }
+
           logger.info('Invoice auto-created after payment', {
             orderId: order.id,
             invoiceNumber,
             amount: order.total
           });
-
-          // Envoi de l'email de confirmation avec la facture
-          const user = await User.findByPk(order.userId);
-          if (user) {
-            await emailService.sendOrderConfirmation(user.email, order, invoice);
-          }
         }
       }
 
@@ -189,7 +193,7 @@ router.post('/create-checkout-session', authenticate, async (req, res) => {
     if (!order) return res.status(404).json({ message: 'Commande introuvable' });
 
     // Prépare les articles pour Stripe
-      const line_items = order.orderItems.map(item => ({
+    const line_items = order.orderItems.map(item => ({
       price_data: {
         currency: 'eur',
         product_data: { name: item.Product.name },
@@ -257,11 +261,14 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
         dueAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         paidAt: new Date()
       });
+      console.log('Facture créée dans le webhook Stripe:', invoice.id);
 
-      // Envoie l'email de confirmation
+      // Génère le PDF de la facture
       const user = await User.findByPk(order.userId);
       if (user) {
-        await emailService.sendOrderConfirmation(user.email, order, invoice);
+        const invoicePath = await generateInvoicePDF(order, invoice, user);
+        await emailService.sendOrderConfirmation(user.email, order, user, invoicePath);
+        console.log('PDF généré à :', invoicePath);
       }
     }
   }

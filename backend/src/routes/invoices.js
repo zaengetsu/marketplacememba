@@ -5,6 +5,8 @@ const { Invoice, Order } = require('../../models');
 const { authenticate } = require('../middlewares/auth');
 const { requirePermission } = require('../middlewares/roleAuth');
 const logger = require('../utils/logger');
+const path = require('path');
+const fs = require('fs');
 
 // GET /api/invoices - Factures de l'utilisateur connecté
 router.get('/', authenticate, async (req, res) => {
@@ -272,4 +274,46 @@ router.get('/admin/all', authenticate, requirePermission('invoices:read'), async
   }
 });
 
+// GET /api/invoices/:id/pdf - Télécharger le PDF de la facture
+router.get('/:id/pdf', authenticate, async (req, res) => {
+  try {
+    const invoice = await Invoice.findOne({
+      where: { id: req.params.id },
+      include: [
+        {
+          model: Order,
+          as: 'order',
+          where: { userId: req.user.id }, // Vérifie que l'utilisateur possède la commande
+          attributes: ['id']
+        }
+      ]
+    });
+
+    if (!invoice) {
+      return res.status(404).json({
+        success: false,
+        message: 'Facture non trouvée'
+      });
+    }
+
+    // Chemin du PDF généré lors de la création de la facture
+    const filePath = path.join(__dirname, '../../invoices', `facture-${invoice.id}.pdf`);
+
+    // Vérifie si le fichier existe
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({
+        success: false,
+        message: 'PDF non généré pour cette facture'
+      });
+    }
+
+    res.download(filePath, `facture-${invoice.id}.pdf`);
+  } catch (error) {
+    logger.error('Error downloading invoice PDF:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erreur lors du téléchargement du PDF'
+    });
+  }
+});
 module.exports = router; 

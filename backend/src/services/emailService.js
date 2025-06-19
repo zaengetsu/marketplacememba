@@ -52,30 +52,30 @@ class EmailService {
   }
 
   async sendPasswordResetEmail(email, token, userData) {
-  if (!this.isEnabled) return;
+    if (!this.isEnabled) return;
 
-  const resetUrl = `http://localhost:5173/reset-password/${token}`;
+    const resetUrl = `http://localhost:5173/reset-password/${token}`;
 
-  const mailOptions = {
-    from: process.env.MAIL_FROM,
-    to: email,
-    subject: 'Réinitialisation de votre mot de passe',
-    html: `
+    const mailOptions = {
+      from: process.env.MAIL_FROM,
+      to: email,
+      subject: 'Réinitialisation de votre mot de passe',
+      html: `
       <p>Bonjour,</p>
       <p>Vous avez demandé à réinitialiser votre mot de passe.</p>
       <p>Cliquez sur le lien ci-dessous pour définir un nouveau mot de passe :</p>
       <p><a href="${resetUrl}">Réinitialiser mon mot de passe</a></p>
       <p>Si vous n'avez pas demandé cette action, ignorez simplement ce message.</p>
     `
-  };
+    };
 
-  try {
-    await this.transporter.sendMail(mailOptions);
-    logger.info(`📧 Email de réinitialisation envoyé à ${email}`);
-  } catch (error) {
-    logger.error('❌ Erreur lors de l’envoi de l’email de réinitialisation :', error);
+    try {
+      await this.transporter.sendMail(mailOptions);
+      logger.info(`📧 Email de réinitialisation envoyé à ${email}`);
+    } catch (error) {
+      logger.error('❌ Erreur lors de l’envoi de l’email de réinitialisation :', error);
+    }
   }
-}
 
   async sendAccountLockedEmail(email, userData) {
     if (!this.isEnabled) return;
@@ -98,17 +98,17 @@ class EmailService {
   }
 
   async sendOrderConfirmation(email, order, userData) {
-  if (!this.isEnabled) return;
+    if (!this.isEnabled) return;
 
-  const name = userData?.firstName
-    ? `${userData.firstName} ${userData.lastName || ''}`.trim()
-    : 'client';
+    const name = userData?.firstName
+      ? `${userData.firstName} ${userData.lastName || ''}`.trim()
+      : 'client';
 
-  const mailOptions = {
-    from: process.env.MAIL_USER,
-    to: email,
-    subject: `Confirmation de votre commande #${order.id}`,
-    text: `Bonjour ${name},
+    const mailOptions = {
+      from: process.env.MAIL_USER,
+      to: email,
+      subject: `Confirmation de votre commande #${order.id}`,
+      text: `Bonjour ${name},
 
 Merci pour votre commande sur Marketplace !
 
@@ -121,7 +121,7 @@ Votre commande est confirmée et sera traitée dans les plus brefs délais.
 Cordialement,
 L'équipe Marketplace
 `,
-    html: `
+      html: `
       <div style="font-family: Arial, sans-serif; color: #222;">
         <h2>Merci pour votre commande !</h2>
         <p>Bonjour <b>${name}</b>,</p>
@@ -139,16 +139,21 @@ L'équipe Marketplace
         <p>Votre commande est confirmée et sera traitée dans les plus brefs délais.</p>
         <p style="margin-top:32px;">Cordialement,<br>L'équipe Marketplace</p>
       </div>
-    `
-  };
+    `,
+    attachments: invoicePath ? [{
+      filename: `facture-${order.id}.pdf`,
+      path: invoicePath
+    }] : []
+    };
 
-  try {
-    await this.transporter.sendMail(mailOptions);
-    logger.info(`📧 Confirmation envoyée à ${email}`);
-  } catch (error) {
-    logger.error('❌ Erreur lors de l’envoi de l’email de confirmation :', error);
+    try {
+      await this.transporter.sendMail(mailOptions);
+      logger.info(`📧 Confirmation envoyée à ${email}`);
+    } catch (error) {
+      logger.error('❌ Erreur lors de l’envoi de l’email de confirmation :', error);
+    }
   }
-}
+
   async sendNewsletter(email, content, userData) {
     if (!this.isEnabled) return;
     // À implémenter si besoin
@@ -215,26 +220,26 @@ L'équipe Marketplace
   }
 
   async sendPasswordChangedEmail(email, userData) {
-  if (!this.isEnabled) return;
+    if (!this.isEnabled) return;
 
-  const mailOptions = {
-    from: process.env.MAIL_FROM,
-    to: email,
-    subject: 'Votre mot de passe a été modifié',
-    html: `
+    const mailOptions = {
+      from: process.env.MAIL_FROM,
+      to: email,
+      subject: 'Votre mot de passe a été modifié',
+      html: `
       <p>Bonjour,</p>
       <p>Votre mot de passe vient d'être modifié.</p>
       <p>Si ce n'est pas vous, <a href="http://localhost:5173/forgot-password">cliquez ici pour réinitialiser votre mot de passe</a>.</p>
     `
-  };
+    };
 
-  try {
-    await this.transporter.sendMail(mailOptions);
-    logger.info(`📧 Email de notification de changement de mot de passe envoyé à ${email}`);
-  } catch (error) {
-    logger.error('❌ Erreur lors de l’envoi de l’email de notification de changement de mot de passe :', error);
+    try {
+      await this.transporter.sendMail(mailOptions);
+      logger.info(`📧 Email de notification de changement de mot de passe envoyé à ${email}`);
+    } catch (error) {
+      logger.error('❌ Erreur lors de l’envoi de l’email de notification de changement de mot de passe :', error);
+    }
   }
-}
 }
 
 module.exports = new EmailService();

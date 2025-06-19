@@ -299,7 +299,6 @@ router.post('/forgot-password', async (req, res) => {
     res.status(500).json({ success: false, error: 'Erreur serveur.' });
   }
 });
-
 // @desc    Renouvellement de mot de passe
 // @route   POST /api/auth/renew-password
 // @access  Private

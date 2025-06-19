@@ -165,7 +165,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useOrderStore, type Invoice } from '@/stores/orders'
+import { useAuthStore } from '@/stores/auth'
 
+const authStore = useAuthStore()
 const orderStore = useOrderStore()
 const selectedInvoice = ref<Invoice | null>(null)
 const pagination = ref<any>(null)
@@ -205,15 +207,27 @@ const viewInvoiceDetails = async (invoiceId: number) => {
 
 const downloadPDF = async (invoiceId: number) => {
   try {
-    // Ici on téléchargerait le PDF de la facture
-    console.log('Télécharger PDF de la facture:', invoiceId)
-    alert('Téléchargement PDF (fonctionnalité à implémenter)')
+    const response = await fetch(`/api/invoices/${invoiceId}/pdf`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${authStore.token}`
+      },
+    });
+    if (!response.ok) throw new Error('Erreur lors du téléchargement du PDF');
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `facture-${invoiceId}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
   } catch (error: any) {
-    console.error('Erreur lors du téléchargement:', error)
-    alert(`Erreur: ${error.message}`)
+    console.error('Erreur lors du téléchargement:', error);
+    alert(`Erreur: ${error.message}`);
   }
 }
-
 const sendInvoice = async (invoiceId: number) => {
   try {
     console.log('Envoyer facture par email:', invoiceId)

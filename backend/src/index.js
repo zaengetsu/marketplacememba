@@ -167,8 +167,7 @@ if (redisStore) {
   logger.warn('Using memory store for sessions (not recommended for production)');
 }
 
-app.use(session(sessionConfig));
-
+app.use('/api/payments/webhook', express.raw({ type: 'application/json' })); // pour le webhook UNIQUEMENT
 // Parse du JSON et des données de formulaire
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -190,8 +189,6 @@ app.use('/api/stock', stockRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/rgpd', rgpdRoutes);
-app.use('/api/webhooks', webhookRoutes);
-
 console.log('✅ Routes API configurées');
 
 // Route de santé
