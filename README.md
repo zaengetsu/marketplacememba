@@ -1,8 +1,17 @@
 # 🛒 E-Commerce Platform - Vue.js & Node.js
 
-Une plateforme e-commerce complète avec architecture hybride PostgreSQL + MongoDB, système de rôles avancé, et conformité RGPD.
+Une plateforme e-commerce complète avec architecture hybride PostgreSQL + MongoDB, système de rôles avancé, conformité RGPD, et gestion complète du paiement et de la facturation.
 
-## 🚀 Fonctionnalités
+---
+
+## 👨‍💻 Auteurs
+
+- **Leonce YOPA**
+- **Ibrahim OUAHABI**
+
+---
+
+## 🚀 Fonctionnalités principales
 
 ### ✨ Frontend (Vue.js 3 + TypeScript)
 - **Interface moderne** avec TailwindCSS
@@ -12,6 +21,8 @@ Une plateforme e-commerce complète avec architecture hybride PostgreSQL + Mongo
 - **Dashboard admin** avec gestion des rôles
 - **Modale de détail produit** interactive
 - **Conformité RGPD** avec gestion des cookies
+- **Affichage des factures** et téléchargement PDF
+- **Page de confirmation de commande** après paiement
 
 ### 🔧 Backend (Node.js + Express)
 - **Architecture hybride** : PostgreSQL (données principales) + MongoDB (recherche)
@@ -20,6 +31,9 @@ Une plateforme e-commerce complète avec architecture hybride PostgreSQL + Mongo
 - **API RESTful** complète avec validation
 - **Authentification JWT** + sessions Redis
 - **Intégration Stripe** pour les paiements
+- **Webhook Stripe** pour confirmation de paiement
+- **Génération automatique de factures PDF** après paiement
+- **Envoi automatique de la facture par email** au client
 - **Logs structurés** avec Winston
 
 ### 🗄️ Base de données
@@ -28,27 +42,21 @@ Une plateforme e-commerce complète avec architecture hybride PostgreSQL + Mongo
 - **Redis** : Sessions, cache temporaire
 - **Synchronisation temps réel** avec hooks Sequelize
 
-## 📋 Prérequis
+---
 
-- **Node.js** 18+ 
-- **PostgreSQL** 14+
-- **MongoDB** 6+
-- **Redis** 7+
-- **Docker** (optionnel)
-
-## 🛠️ Installation
+## 🛠️ Lancer le projet (Guide rapide)
 
 ### 1. Cloner le projet
 ```bash
 git clone <votre-repo>
-cd VUEJS
+cd marketplacememba
 ```
 
 ### 2. Configuration des bases de données
 
 #### Avec Docker (Recommandé)
 ```bash
-# Démarrer PostgreSQL, MongoDB et Redis
+# Démarrer tous les services (PostgreSQL, MongoDB, Redis, backend)
 docker-compose up -d
 ```
 
@@ -65,9 +73,9 @@ cd backend
 # Installer les dépendances
 npm install
 
-# Configurer l'environnement
+# Copier la configuration d'exemple
 cp env.example .env
-# Éditer .env avec vos configurations
+# Éditer .env avec vos clés et infos (Stripe, DB, mail...)
 
 # Exécuter les migrations
 npx sequelize-cli db:migrate
@@ -87,7 +95,7 @@ cd frontend
 # Installer les dépendances
 npm install
 
-# Configurer l'environnement
+# Copier la configuration d'exemple
 cp env.example .env
 # Éditer .env avec vos configurations
 
@@ -95,7 +103,9 @@ cp env.example .env
 npm run dev
 ```
 
-## 🔑 Configuration Stripe
+---
+
+## 🔑 Configuration Stripe & Webhook
 
 1. Créer un compte sur [Stripe](https://stripe.com)
 2. Récupérer vos clés API
@@ -112,6 +122,31 @@ STRIPE_WEBHOOK_SECRET=whsec_votre_webhook_secret
 VITE_STRIPE_PUBLIC_KEY=pk_test_votre_cle_publique
 ```
 
+4. **Configurer le webhook Stripe** :
+   - Lancer ngrok :  
+     ```bash
+     ngrok http 3000
+     ```
+   - Copier l'URL générée (ex: `https://xxxx.ngrok-free.app`)
+   - Dans le dashboard Stripe, ajouter un endpoint webhook :  
+     ```
+     https://xxxx.ngrok-free.app/api/payments/webhook
+     ```
+   - Sélectionner l'événement `checkout.session.completed`
+
+---
+
+## 🧾 Fonctionnalités de paiement et facturation
+
+- **Paiement sécurisé Stripe Checkout**
+- **Webhook Stripe** pour confirmation de paiement
+- **Création automatique de la facture** après paiement
+- **Génération du PDF de la facture**
+- **Envoi automatique de la facture par email** au client
+- **Téléchargement de la facture depuis l'espace client**
+
+---
+
 ## 👥 Comptes de démonstration
 
 | Email | Mot de passe | Rôle |
@@ -119,6 +154,8 @@ VITE_STRIPE_PUBLIC_KEY=pk_test_votre_cle_publique
 | admin@ecommerce.com | password123 | ROLE_ADMIN |
 | john.doe@example.com | password123 | ROLE_USER |
 | marie.martin@example.com | password123 | ROLE_USER |
+
+---
 
 ## 🏗️ Architecture
 
@@ -132,19 +169,12 @@ VITE_STRIPE_PUBLIC_KEY=pk_test_votre_cle_publique
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
-### Synchronisation des données
-```
-PostgreSQL (Source de vérité)
-     ↓ Hooks Sequelize
-MongoDB (Recherche + Cache)
-     ↓ Index full-text
-Frontend (Recherche rapide)
-```
+---
 
 ## 📁 Structure du projet
 
 ```
-VUEJS/
+marketplacememba/
 ├── backend/
 │   ├── src/
 │   │   ├── models/          # Modèles Sequelize & Mongoose
@@ -154,159 +184,41 @@ VUEJS/
 │   │   ├── utils/           # Utilitaires
 │   │   └── database/        # Configuration DB
 │   ├── migrations/          # Migrations Sequelize
-│   ├── seeders/            # Données de démonstration
-│   └── env.example         # Configuration exemple
+│   ├── seeders/             # Données de démonstration
+│   └── env.example          # Configuration exemple
 ├── frontend/
 │   ├── src/
 │   │   ├── components/      # Composants Vue
-│   │   ├── views/          # Pages
-│   │   ├── stores/         # Stores Pinia
-│   │   ├── services/       # Services API
-│   │   ├── types/          # Types TypeScript
-│   │   └── composables/    # Composables Vue
-│   └── env.example         # Configuration exemple
-└── docker-compose.yml      # Services Docker
+│   │   ├── views/           # Pages
+│   │   ├── stores/          # Stores Pinia
+│   │   ├── services/        # Services API
+│   │   ├── types/           # Types TypeScript
+│   │   └── composables/     # Composables Vue
+│   └── env.example          # Configuration exemple
+└── docker-compose.yml       # Services Docker
 ```
 
-## 🔐 Système de permissions
+---
 
-| Rôle | Produits | Utilisateurs | Commandes | Factures | Analytics |
-|------|----------|--------------|-----------|----------|-----------|
-| **ROLE_ADMIN** | ✅ CRUD | ✅ CRUD | ✅ CRUD | ✅ CRUD | ✅ Toutes |
-| **ROLE_STORE_KEEPER** | ✅ CRUD | ❌ | ✅ Lecture | ❌ | ❌ |
-| **ROLE_COMPTA** | ❌ | ❌ | ✅ Lecture | ✅ CRUD | ✅ Financières |
-| **ROLE_USER** | ✅ Lecture | ❌ | ✅ Ses commandes | ❌ | ❌ |
+## 🛠️ Conseils pour les futurs développeurs
 
-## 🛒 Fonctionnalités du panier
+- **Toujours utiliser le fichier `.env` pour les variables sensibles** (ne jamais commit de clé secrète dans le code).
+- **Pour Stripe en local, utiliser ngrok** et mettre à jour l’URL du webhook à chaque redémarrage de ngrok.
+- **Bien vérifier l’ordre des middlewares dans Express** pour Stripe (webhook AVANT le parseur JSON).
+- **Pour toute modification de la structure DB, exécuter les migrations et seeds** :
+  ```bash
+  docker-compose exec ecommerce-backend npx sequelize-cli db:migrate
+  docker-compose exec ecommerce-backend npx sequelize-cli db:seed:all
+  ```
+- **Consultez les logs backend pour tout problème de paiement, facture ou mail.**
+- **Pour le support, ouvrez une issue GitHub ou contactez les auteurs.**
 
-- **Réservation temporaire** : 15 minutes par défaut
-- **Vérification de stock** en temps réel
-- **Persistance** localStorage + session backend
-- **Nettoyage automatique** des réservations expirées
-
-## 📊 Monitoring et logs
-
-- **Winston** pour les logs structurés
-- **Statistiques** de synchronisation
-- **Métriques** de performance
-- **Alertes** de stock faible
-
-## 🔒 Sécurité et RGPD
-
-- **Chiffrement** des mots de passe (bcrypt)
-- **Validation** des données (Joi/Zod)
-- **Rate limiting** anti-spam
-- **Headers de sécurité** (Helmet)
-- **Gestion des cookies** conforme RGPD
-- **Droit à l'oubli** implémenté
-
-## 🚀 Déploiement
-
-### Variables d'environnement production
-
-**Backend**
-```env
-NODE_ENV=production
-JWT_SECRET=votre-secret-jwt-super-securise
-SESSION_SECRET=votre-secret-session-super-securise
-DATABASE_URL=postgresql://user:pass@host:5432/db
-MONGODB_URI=mongodb://host:27017/db
-REDIS_URL=redis://host:6379
-STRIPE_SECRET_KEY=sk_live_votre_cle_live
-```
-
-**Frontend**
-```env
-VITE_API_URL=https://votre-api.com/api
-VITE_STRIPE_PUBLIC_KEY=pk_live_votre_cle_publique_live
-```
-
-### Docker Production
-```bash
-# Build et déploiement
-docker-compose -f docker-compose.prod.yml up -d
-```
-
-## 📚 API Documentation
-
-### Endpoints principaux
-
-| Méthode | Endpoint | Description | Auth |
-|---------|----------|-------------|------|
-| `GET` | `/api/products` | Liste des produits | Public |
-| `POST` | `/api/products` | Créer un produit | Admin/Store |
-| `GET` | `/api/cart` | Récupérer le panier | Session |
-| `POST` | `/api/cart/add` | Ajouter au panier | Session |
-| `POST` | `/api/auth/login` | Connexion | Public |
-| `GET` | `/api/admin/stats` | Statistiques | Admin |
-
-### Exemples d'utilisation
-
-```javascript
-// Récupérer les produits avec filtres
-const products = await productService.getProducts({
-  category: 'electronique',
-  search: 'iPhone',
-  minPrice: 100,
-  maxPrice: 2000,
-  onSale: true,
-  page: 1,
-  limit: 12
-})
-
-// Ajouter au panier
-await cartService.addToCart('product-id', 2)
-```
-
-## 🐛 Dépannage
-
-### Problèmes courants
-
-**Erreur de connexion PostgreSQL**
-```bash
-# Vérifier que PostgreSQL est démarré
-sudo service postgresql status
-
-# Créer la base de données
-createdb ecommerce
-```
-
-**Erreur de synchronisation MongoDB**
-```bash
-# Vérifier la connexion MongoDB
-mongosh mongodb://localhost:27017/ecommerce_search
-
-# Relancer la synchronisation
-npm run sync:force
-```
-
-**Erreur Redis**
-```bash
-# Démarrer Redis
-redis-server
-
-# Vérifier la connexion
-redis-cli ping
-```
-
-## 🤝 Contribution
-
-1. Fork le projet
-2. Créer une branche (`git checkout -b feature/nouvelle-fonctionnalite`)
-3. Commit (`git commit -am 'Ajouter nouvelle fonctionnalité'`)
-4. Push (`git push origin feature/nouvelle-fonctionnalite`)
-5. Créer une Pull Request
+---
 
 ## 📄 Licence
 
 Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
-## 🆘 Support
-
-- **Issues** : [GitHub Issues](https://github.com/votre-repo/issues)
-- **Documentation** : [Wiki](https://github.com/votre-repo/wiki)
-- **Email** : support@votre-domaine.com
-
 ---
 
-**Développé avec ❤️ par [Votre Nom]** 
+**Développé avec ❤️ par Leonce YOPA & Ibrahim OUAHABI**
