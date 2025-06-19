@@ -12,27 +12,24 @@
         <div class="lg:col-span-1">
           <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div class="flex items-center mb-6">
-              <div class="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center text-white text-xl font-bold">
+              <div
+                class="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center text-white text-xl font-bold">
                 {{ userInitials }}
               </div>
               <div class="ml-4">
-                <h3 class="font-semibold text-gray-900">{{ authStore.user?.firstName }} {{ authStore.user?.lastName }}</h3>
+                <h3 class="font-semibold text-gray-900">{{ authStore.user?.firstName }} {{ authStore.user?.lastName }}
+                </h3>
                 <p class="text-sm text-gray-600">{{ authStore.user?.email }}</p>
               </div>
             </div>
 
             <nav class="space-y-2">
-              <button
-                v-for="tab in tabs"
-                :key="tab.id"
-                @click="activeTab = tab.id"
-                :class="[
-                  'w-full text-left px-4 py-3 rounded-lg transition-colors',
-                  activeTab === tab.id
-                    ? 'bg-orange-50 text-orange-600 border border-orange-200'
-                    : 'text-gray-700 hover:bg-gray-50'
-                ]"
-              >
+              <button v-for="tab in tabs" :key="tab.id" @click="activeTab = tab.id" :class="[
+                'w-full text-left px-4 py-3 rounded-lg transition-colors',
+                activeTab === tab.id
+                  ? 'bg-orange-50 text-orange-600 border border-orange-200'
+                  : 'text-gray-700 hover:bg-gray-50'
+              ]">
                 <span class="mr-3">{{ tab.icon }}</span>
                 {{ tab.label }}
               </button>
@@ -46,17 +43,14 @@
             <!-- Personal Information Tab -->
             <div v-if="activeTab === 'personal'" class="p-6">
               <h2 class="text-xl font-semibold text-gray-900 mb-6">Informations personnelles</h2>
-              
+
               <form @submit="handlePersonalInfoSubmit" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Prénom</label>
-                    <input
-                      v-model="personalForm.data.firstName"
-                      type="text"
+                    <input v-model="personalForm.data.firstName" type="text"
                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      :class="{ 'border-red-500': personalForm.errors.value.firstName }"
-                    />
+                      :class="{ 'border-red-500': personalForm.errors.value.firstName }" />
                     <p v-if="personalForm.errors.value.firstName" class="text-red-500 text-sm mt-1">
                       {{ personalForm.errors.value.firstName }}
                     </p>
@@ -64,12 +58,9 @@
 
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Nom</label>
-                    <input
-                      v-model="personalForm.data.lastName"
-                      type="text"
+                    <input v-model="personalForm.data.lastName" type="text"
                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      :class="{ 'border-red-500': personalForm.errors.value.lastName }"
-                    />
+                      :class="{ 'border-red-500': personalForm.errors.value.lastName }" />
                     <p v-if="personalForm.errors.value.lastName" class="text-red-500 text-sm mt-1">
                       {{ personalForm.errors.value.lastName }}
                     </p>
@@ -78,12 +69,9 @@
 
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                  <input
-                    v-model="personalForm.data.email"
-                    type="email"
+                  <input v-model="personalForm.data.email" type="email"
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    :class="{ 'border-red-500': personalForm.errors.value.email }"
-                  />
+                    :class="{ 'border-red-500': personalForm.errors.value.email }" />
                   <p v-if="personalForm.errors.value.email" class="text-red-500 text-sm mt-1">
                     {{ personalForm.errors.value.email }}
                   </p>
@@ -91,12 +79,9 @@
 
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
-                  <input
-                    v-model="personalForm.data.phone"
-                    type="tel"
+                  <input v-model="personalForm.data.phone" type="tel"
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    :class="{ 'border-red-500': personalForm.errors.value.phone }"
-                  />
+                    :class="{ 'border-red-500': personalForm.errors.value.phone }" />
                   <p v-if="personalForm.errors.value.phone" class="text-red-500 text-sm mt-1">
                     {{ personalForm.errors.value.phone }}
                   </p>
@@ -104,19 +89,13 @@
 
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Date de naissance</label>
-                  <input
-                    v-model="personalForm.data.birthDate"
-                    type="date"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  />
+                  <input v-model="personalForm.data.birthDate" type="date"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" />
                 </div>
 
                 <div class="flex justify-end">
-                  <button
-                    type="submit"
-                    :disabled="personalForm.isLoading.value"
-                    class="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition-all disabled:opacity-50"
-                  >
+                  <button type="submit" :disabled="personalForm.isLoading.value"
+                    class="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition-all disabled:opacity-50">
                     {{ personalForm.isLoading ? 'Enregistrement...' : 'Enregistrer' }}
                   </button>
                 </div>
@@ -126,16 +105,13 @@
             <!-- Password Tab -->
             <div v-if="activeTab === 'password'" class="p-6">
               <h2 class="text-xl font-semibold text-gray-900 mb-6">Changer le mot de passe</h2>
-              
+
               <form @submit="handlePasswordSubmit" class="space-y-6">
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Mot de passe actuel</label>
-                  <input
-                    v-model="passwordForm.data.currentPassword"
-                    type="password"
+                  <input v-model="passwordForm.data.currentPassword" type="password"
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    :class="{ 'border-red-500': passwordForm.errors.value.currentPassword }"
-                  />
+                    :class="{ 'border-red-500': passwordForm.errors.value.currentPassword }" />
                   <p v-if="passwordForm.errors.value.currentPassword" class="text-red-500 text-sm mt-1">
                     {{ passwordForm.errors.value.currentPassword }}
                   </p>
@@ -143,12 +119,9 @@
 
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Nouveau mot de passe</label>
-                  <input
-                    v-model="passwordForm.data.newPassword"
-                    type="password"
+                  <input v-model="passwordForm.data.newPassword" type="password"
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    :class="{ 'border-red-500': passwordForm.errors.value.newPassword }"
-                  />
+                    :class="{ 'border-red-500': passwordForm.errors.value.newPassword }" />
                   <p v-if="passwordForm.errors.value.newPassword" class="text-red-500 text-sm mt-1">
                     {{ passwordForm.errors.value.newPassword }}
                   </p>
@@ -156,23 +129,17 @@
 
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Confirmer le nouveau mot de passe</label>
-                  <input
-                    v-model="passwordForm.data.confirmPassword"
-                    type="password"
+                  <input v-model="passwordForm.data.confirmPassword" type="password"
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    :class="{ 'border-red-500': passwordForm.errors.value.confirmPassword }"
-                  />
+                    :class="{ 'border-red-500': passwordForm.errors.value.confirmPassword }" />
                   <p v-if="passwordForm.errors.value.confirmPassword" class="text-red-500 text-sm mt-1">
                     {{ passwordForm.errors.value.confirmPassword }}
                   </p>
                 </div>
 
                 <div class="flex justify-end">
-                  <button
-                    type="submit"
-                    :disabled="passwordForm.isLoading.value"
-                    class="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition-all disabled:opacity-50"
-                  >
+                  <button type="submit" :disabled="passwordForm.isLoading.value"
+                    class="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition-all disabled:opacity-50">
                     {{ passwordForm.isLoading ? 'Modification...' : 'Modifier le mot de passe' }}
                   </button>
                 </div>
@@ -183,34 +150,26 @@
             <div v-if="activeTab === 'orders'" class="p-6">
               <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-semibold text-gray-900">Mes commandes</h2>
-                <router-link
-                  to="/orders"
-                  class="text-orange-600 hover:text-orange-700 font-medium"
-                >
+                <router-link to="/orders" class="text-orange-600 hover:text-orange-700 font-medium">
                   Voir toutes les commandes →
                 </router-link>
               </div>
 
               <div class="space-y-4">
-                <div
-                  v-for="order in recentOrders"
-                  :key="order.id"
-                  class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
-                >
+                <div v-for="order in recentOrders" :key="order.id"
+                  class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                   <div class="flex justify-between items-start mb-2">
                     <div>
                       <h3 class="font-medium text-gray-900">Commande #{{ order.id }}</h3>
                       <p class="text-sm text-gray-600">{{ formatDate(order.createdAt) }}</p>
                     </div>
-                    <span
-                      :class="[
-                        'px-3 py-1 rounded-full text-xs font-medium',
-                        order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                    <span :class="[
+                      'px-3 py-1 rounded-full text-xs font-medium',
+                      order.status === 'delivered' ? 'bg-green-100 text-green-800' :
                         order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                        order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-gray-100 text-gray-800'
-                      ]"
-                    >
+                          order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-gray-100 text-gray-800'
+                    ]">
                       {{ getStatusLabel(order.status) }}
                     </span>
                   </div>
@@ -229,33 +188,24 @@
             <!-- Preferences Tab -->
             <div v-if="activeTab === 'preferences'" class="p-6">
               <h2 class="text-xl font-semibold text-gray-900 mb-6">Préférences</h2>
-              
+
               <div class="space-y-6">
                 <div>
                   <h3 class="text-lg font-medium text-gray-900 mb-4">Notifications</h3>
                   <div class="space-y-3">
                     <label class="flex items-center">
-                      <input
-                        v-model="preferences.emailNotifications"
-                        type="checkbox"
-                        class="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-                      />
+                      <input v-model="preferences.emailNotifications" type="checkbox"
+                        class="rounded border-gray-300 text-orange-600 focus:ring-orange-500" />
                       <span class="ml-3 text-gray-700">Recevoir les notifications par email</span>
                     </label>
                     <label class="flex items-center">
-                      <input
-                        v-model="preferences.promotionalEmails"
-                        type="checkbox"
-                        class="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-                      />
+                      <input v-model="preferences.promotionalEmails" type="checkbox"
+                        class="rounded border-gray-300 text-orange-600 focus:ring-orange-500" />
                       <span class="ml-3 text-gray-700">Recevoir les offres promotionnelles</span>
                     </label>
                     <label class="flex items-center">
-                      <input
-                        v-model="preferences.orderUpdates"
-                        type="checkbox"
-                        class="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
-                      />
+                      <input v-model="preferences.orderUpdates" type="checkbox"
+                        class="rounded border-gray-300 text-orange-600 focus:ring-orange-500" />
                       <span class="ml-3 text-gray-700">Notifications de suivi de commande</span>
                     </label>
                   </div>
@@ -266,10 +216,8 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label class="block text-sm font-medium text-gray-700 mb-2">Langue</label>
-                      <select
-                        v-model="preferences.language"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      >
+                      <select v-model="preferences.language"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                         <option value="fr">Français</option>
                         <option value="en">English</option>
                         <option value="es">Español</option>
@@ -277,10 +225,8 @@
                     </div>
                     <div>
                       <label class="block text-sm font-medium text-gray-700 mb-2">Devise</label>
-                      <select
-                        v-model="preferences.currency"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      >
+                      <select v-model="preferences.currency"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
                         <option value="EUR">Euro (€)</option>
                         <option value="USD">Dollar ($)</option>
                         <option value="GBP">Livre (£)</option>
@@ -290,11 +236,8 @@
                 </div>
 
                 <div class="flex justify-end">
-                  <button
-                    @click="savePreferences"
-                    :disabled="isLoadingPreferences"
-                    class="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition-all disabled:opacity-50"
-                  >
+                  <button @click="savePreferences" :disabled="isLoadingPreferences"
+                    class="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition-all disabled:opacity-50">
                     {{ isLoadingPreferences ? 'Enregistrement...' : 'Enregistrer les préférences' }}
                   </button>
                 </div>
@@ -376,10 +319,28 @@ const passwordForm = useForm({
   },
   validationSchema: passwordSchema,
   onSubmit: async (data) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    toast.success('Mot de passe modifié avec succès')
-    passwordForm.reset()
+    try {
+      const res = await fetch('/api/auth/renew-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authStore.token}` // <-- ajoute cette ligne
+        },
+        body: JSON.stringify({
+          currentPassword: data.currentPassword,
+          newPassword: data.newPassword
+        })
+      })
+      const result = await res.json()
+      if (result.success) {
+        toast.success('Mot de passe modifié avec succès')
+        passwordForm.reset()
+      } else {
+        toast.error(result.error || 'Erreur lors du changement de mot de passe')
+      }
+    } catch (e) {
+      toast.error('Erreur serveur')
+    }
   }
 })
 

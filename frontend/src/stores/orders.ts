@@ -175,34 +175,29 @@ export const useOrderStore = defineStore('orders', () => {
   }
 
   const processCheckout = async (cartItems: any[], shippingAddress: any, billingAddress?: any) => {
-    try {
-      // 1. Calculer le total
-      const total = cartItems.reduce((sum, item) => {
-        const price = item.product.isOnSale && item.product.salePrice 
-          ? item.product.salePrice 
-          : item.product.price
-        return sum + (price * item.quantity)
-      }, 0)
+  try {
+    // 1. Calculer le total (utilise item.price déjà préparé)
+    const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
 
-      // 2. Créer la commande
-      const order = await createOrder({
-        total,
-        shippingAddress,
-        billingAddress: billingAddress || shippingAddress,
-        items: cartItems
-      })
+    // 2. Créer la commande
+    const order = await createOrder({
+      total,
+      shippingAddress,
+      billingAddress: billingAddress || shippingAddress,
+      items: cartItems
+    })
 
-      // 3. Créer l'intention de paiement
-      const paymentIntent = await createPaymentIntent(total, order.id)
+    // 3. Créer l'intention de paiement
+    const paymentIntent = await createPaymentIntent(total, order.id)
 
-      return {
-        order,
-        paymentIntent
-      }
-    } catch (error) {
-      throw error
+    return {
+      order,
+      paymentIntent
     }
+  } catch (error) {
+    throw error
   }
+}
 
   const clearCurrentOrder = () => {
     currentOrder.value = null

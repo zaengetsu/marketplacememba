@@ -98,23 +98,57 @@ class EmailService {
   }
 
   async sendOrderConfirmation(email, order, userData) {
-    if (!this.isEnabled) return;
+  if (!this.isEnabled) return;
 
-    const mailOptions = {
-      from: process.env.MAIL_USER,
-      to: email,
-      subject: `Confirmation de votre commande #${order.id}`,
-      text: `Bonjour ${userData?.name || 'client'},\n\nMerci pour votre commande ! Voici les détails :\n\n- Numéro de commande : ${order.id}\n- Montant total : ${order.total} €\n\nCordialement,\nL'équipe Marketplace`,
-    };
+  const name = userData?.firstName
+    ? `${userData.firstName} ${userData.lastName || ''}`.trim()
+    : 'client';
 
-    try {
-      await this.transporter.sendMail(mailOptions);
-      logger.info(`📧 Confirmation envoyée à ${email}`);
-    } catch (error) {
-      logger.error('❌ Erreur lors de l’envoi de l’email de confirmation :', error);
-    }
+  const mailOptions = {
+    from: process.env.MAIL_USER,
+    to: email,
+    subject: `Confirmation de votre commande #${order.id}`,
+    text: `Bonjour ${name},
+
+Merci pour votre commande sur Marketplace !
+
+Détails de la commande :
+- Numéro de commande : ${order.id}
+- Montant total : ${order.total} €
+
+Votre commande est confirmée et sera traitée dans les plus brefs délais.
+
+Cordialement,
+L'équipe Marketplace
+`,
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #222;">
+        <h2>Merci pour votre commande !</h2>
+        <p>Bonjour <b>${name}</b>,</p>
+        <p>Votre commande <b>#${order.id}</b> a bien été confirmée.</p>
+        <table style="margin: 16px 0;">
+          <tr>
+            <td style="padding: 4px 8px;">Numéro de commande :</td>
+            <td style="padding: 4px 8px;"><b>${order.id}</b></td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 8px;">Montant total :</td>
+            <td style="padding: 4px 8px;"><b>${order.total} €</b></td>
+          </tr>
+        </table>
+        <p>Votre commande est confirmée et sera traitée dans les plus brefs délais.</p>
+        <p style="margin-top:32px;">Cordialement,<br>L'équipe Marketplace</p>
+      </div>
+    `
+  };
+
+  try {
+    await this.transporter.sendMail(mailOptions);
+    logger.info(`📧 Confirmation envoyée à ${email}`);
+  } catch (error) {
+    logger.error('❌ Erreur lors de l’envoi de l’email de confirmation :', error);
   }
-
+}
   async sendNewsletter(email, content, userData) {
     if (!this.isEnabled) return;
     // À implémenter si besoin

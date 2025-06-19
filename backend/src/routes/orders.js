@@ -107,15 +107,24 @@ router.post('/', authenticate, async (req, res) => {
       status: 'pending'
     });
 
+    const{ OrderItem } = require('../../models'); 
+    for (const item of items) {
+      await OrderItem.create({
+        orderId: order.id,
+        productId: item.productId,
+        quantity: item.quantity,
+        price: item.price
+      });
+    }
     logger.info(`Order created: ${order.id}`, { userId: req.user.id });
 
     // Envoi email confirmation
-    try {
-      await emailService.sendOrderConfirmation(req.user.email, order, req.user);
-      logger.info(`Email confirmation envoyé à ${req.user.email}`);
-    } catch (emailErr) {
-      logger.error('Erreur envoi email confirmation commande :', emailErr);
-    }
+    // try {
+    //   await emailService.sendOrderConfirmation(req.user.email, order, req.user);
+    //   logger.info(`Email confirmation envoyé à ${req.user.email}`);
+    // } catch (emailErr) {
+    //   logger.error('Erreur envoi email confirmation commande :', emailErr);
+    // }
 
     res.status(201).json({
       success: true,
