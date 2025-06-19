@@ -55,39 +55,8 @@ services:
     restart: always
     ports:
       - "3000:3000"
-    environment:
-      NODE_ENV: development
-      PORT: 3000
-      # PostgreSQL (données principales)
-      DATABASE_URL: postgres://postgres:password123@postgres:5432/ecommerce
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: ecommerce
-      DB_USER: postgres
-      DB_PASSWORD: password123
-      # MongoDB (recherche)
-      MONGODB_URI: mongodb://admin:password123@mongodb:27017/ecommerce?authSource=admin
-      # Redis (sessions)
-      REDIS_URL: redis://redis:6379
-      # JWT
-      JWT_SECRET: your-super-secret-jwt-key-change-in-production
-      JWT_EXPIRES_IN: 7d
-      SESSION_SECRET: your-super-secret-session-key-change-in-production
-      # Email
-      EMAIL_HOST: smtp.gmail.com
-      EMAIL_PORT: 587
-      EMAIL_USER: your-email@gmail.com
-      EMAIL_PASS: your-email-password
-      EMAIL_FROM: your-email@gmail.com
-      # Paiement
-      STRIPE_SECRET_KEY: sk_test_your_stripe_secret_key
-      STRIPE_WEBHOOK_SECRET: your-stripe_webhook_secret
-      PAYPAL_CLIENT_ID: your-paypal-client-id
-      PAYPAL_CLIENT_SECRET: your-paypal-client-secret
-      # Livraison
-      LAPOSTE_API_KEY: your-laposte-api-key
-      # Frontend
-      FRONTEND_URL: http://localhost:5173
+    env_file:
+       ./backend/.env
     volumes:
       - ./backend:/app
       - /app/node_modules
@@ -98,7 +67,6 @@ services:
     networks:
       - ecommerce-network
     command: npm run dev
-
   # Frontend VueJS
   frontend:
     build:

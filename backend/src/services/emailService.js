@@ -97,11 +97,11 @@ class EmailService {
     // À implémenter si besoin
   }
 
-  async sendOrderConfirmation(email, order, userData) {
+  async sendOrderConfirmation(email, order, user, invoicePath) {
     if (!this.isEnabled) return;
 
-    const name = userData?.firstName
-      ? `${userData.firstName} ${userData.lastName || ''}`.trim()
+    const name = user?.firstName
+      ? `${user.firstName} ${user.lastName || ''}`.trim()
       : 'client';
 
     const mailOptions = {

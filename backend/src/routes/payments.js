@@ -218,7 +218,9 @@ router.post('/create-checkout-session', authenticate, async (req, res) => {
   }
 });
 
-router.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+
+const webhookHandler = async (req, res) => {
+  console.log('>>> Stripe webhook hit');
   const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
   const sig = req.headers['stripe-signature'];
@@ -227,6 +229,7 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
   try {
     event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
   } catch (err) {
+    console.error('❌ Stripe webhook signature error:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
@@ -274,6 +277,10 @@ router.post('/webhook', express.raw({ type: 'application/json' }), async (req, r
   }
 
   res.json({ received: true });
-});
+};
+
+router.post('/webhook', express.raw({ type: 'application/json' }), webhookHandler);
+
 
 module.exports = router; 
+module.exports.webhookHandler = webhookHandler

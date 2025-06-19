@@ -113,7 +113,7 @@ app.use(helmet({
 
 // Configuration CORS
 app.use(cors({
-  origin: process.env.FRONTEND_URL || ['http://localhost:5173', 'http://localhost:5174'],
+  origin: ['http://localhost:5173', 'http://localhost:5174'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
@@ -167,7 +167,12 @@ if (redisStore) {
   logger.warn('Using memory store for sessions (not recommended for production)');
 }
 
-app.use('/api/payments/webhook', express.raw({ type: 'application/json' })); // pour le webhook UNIQUEMENT
+app.post(
+  '/api/payments/webhook',
+  express.raw({ type: 'application/json' }),
+  require('./routes/payments').webhookHandler // à créer, voir ci-dessous
+);
+
 // Parse du JSON et des données de formulaire
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
