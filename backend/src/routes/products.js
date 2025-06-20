@@ -111,7 +111,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const product = await Product.findOne({
-      where: { 
+      where: {
         id: req.params.id
       },
       include: [
@@ -246,7 +246,7 @@ router.post('/', authenticate, requirePermission('products:write'), async (req, 
 router.put('/:id', authenticate, requirePermission('products:write'), async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id);
-    
+
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -324,7 +324,7 @@ router.put('/:id', authenticate, requirePermission('products:write'), async (req
 
   } catch (error) {
     logger.error('Error updating product:', error);
-    
+
     if (error.name === 'SequelizeUniqueConstraintError') {
       return res.status(400).json({
         success: false,
@@ -343,7 +343,7 @@ router.put('/:id', authenticate, requirePermission('products:write'), async (req
 router.delete('/:id', authenticate, requirePermission('products:delete'), async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id);
-    
+
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -373,7 +373,7 @@ router.delete('/:id', authenticate, requirePermission('products:delete'), async 
 router.patch('/:id/toggle-status', authenticate, requirePermission('products:write'), async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id);
-    
+
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -386,9 +386,9 @@ router.patch('/:id/toggle-status', authenticate, requirePermission('products:wri
       status: !product.isActive ? 'active' : 'inactive'
     });
 
-    logger.info(`Product status toggled: ${req.params.id}`, { 
+    logger.info(`Product status toggled: ${req.params.id}`, {
       userId: req.user.id,
-      newStatus: product.isActive 
+      newStatus: product.isActive
     });
 
     res.json({
