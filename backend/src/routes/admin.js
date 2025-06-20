@@ -212,25 +212,101 @@ router.get('/stats/revenue-per-month', authenticate, requirePermission('analytic
   res.json({ success: true, data: result });
 });
 
-// GET /api/admin/orders - Liste des commandes (avec utilisateur)
+// GET /api/admin/orders - Liste paginée, recherche, filtre
 router.get('/orders', authenticate, requirePermission('orders:read'), async (req, res) => {
   try {
     const { Order, User } = require('../../models');
-    const orders = await Order.findAll({
+    const { page = 1, limit = 10, search, status } = req.query;
+    const offset = (page - 1) * limit;
+    const where = {};
+    const userWhere = {};
+
+    if (status) where.status = status;
+    if (search) {
+      userWhere[Op.or] = [
+        { firstName: { [Op.iLike]: `%${search}%` } },
+        { lastName: { [Op.iLike]: `%${search}%` } }
+        // Ajoute { email: { [Op.iLike]: `%${search}%` } } si tu veux chercher sur l'email aussi
+      ];
+    }
+
+    const { count, rows: orders } = await Order.findAndCountAll({
+      where,
       include: [
-        { model: User, attributes: ['firstName', 'lastName'] }
+        {
+          model: User,
+          as: 'user',
+          attributes: ['firstName', 'lastName'],
+          where: Object.keys(userWhere).length ? userWhere : undefined
+        }
       ],
-      order: [['createdAt', 'DESC']]
+      order: [['createdAt', 'DESC']],
+      limit: parseInt(limit),
+      offset: parseInt(offset)
     });
+
     res.json({
       success: true,
-      data: { orders }
+      data: {
+        orders,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total: count,
+          pages: Math.ceil(count / limit)
+        }
+      }
     });
   } catch (error) {
+  console.error('Erreur /admin/orders :', error); // <-- Ajoute cette ligne
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des commandes'
     });
+  }
+});
+
+// POST /api/admin/users - Créer un nouvel utilisateur (avec email de confirmation)
+router.post('/users', authenticate, requirePermission('users:write'), async (req, res) => {
+  try {
+    const { firstName, lastName, email, password, role } = req.body;
+    if (!firstName || !lastName || !email || !password || !role) {
+      return res.status(400).json({ success: false, message: 'Champs manquants' });
+    }
+    // Vérifie si l'email existe déjà
+    const exists = await User.findOne({ where: { email } });
+    if (exists) {
+      return res.status(409).json({ success: false, message: 'Email déjà utilisé' });
+    }
+    // Hash du mot de passe
+    const bcrypt = require('bcryptjs');
+    const crypto = require('crypto');
+    const emailService = require('../services/emailService');
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+
+    const user = await User.create({
+      firstName,
+      lastName,
+      email,
+      password: hashedPassword,
+      role,
+      isActive: true,
+      isEmailVerified: false,
+      emailVerificationToken
+    });
+
+    // Envoi de l'email de vérification
+    await emailService.sendVerificationEmail(
+      user.email,
+      emailVerificationToken,
+      user
+    );
+
+    res.json({ success: true, data: { id: user.id, email: user.email } });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Erreur lors de la création' });
   }
 });
 
