@@ -18,7 +18,7 @@
       </div>
 
       <!-- Stats Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div v-if="stats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div class="card">
           <div class="card-body">
             <div class="flex items-center">
@@ -27,7 +27,9 @@
               </div>
               <div>
                 <p class="text-sm text-gray-600">Utilisateurs</p>
-                <p class="text-2xl font-bold">{{ stats.users }}</p>
+                <p class="text-2xl font-bold">{{ stats?.users?.total ?? 0 }}</p>
+                <p class="text-xs text-gray-500">Actifs : {{ stats?.users?.active ?? 0 }}</p>
+                <p class="text-xs text-gray-500">Nouveaux cette semaine : {{ stats?.users?.newThisWeek ?? 0 }}</p>
               </div>
             </div>
           </div>
@@ -41,7 +43,9 @@
               </div>
               <div>
                 <p class="text-sm text-gray-600">Produits</p>
-                <p class="text-2xl font-bold">{{ stats.products }}</p>
+                <p class="text-2xl font-bold">{{ stats?.products?.total ?? 0 }}</p>
+                <p class="text-xs text-gray-500">Stock faible : {{ stats?.products?.lowStock ?? 0 }}</p>
+
               </div>
             </div>
           </div>
@@ -55,7 +59,9 @@
               </div>
               <div>
                 <p class="text-sm text-gray-600">Commandes</p>
-                <p class="text-2xl font-bold">{{ stats.orders }}</p>
+                <p class="text-2xl font-bold">{{ stats?.orders?.total ?? 0 }}</p>
+                <p class="text-xs text-gray-500">En attente : {{ stats?.orders?.pending ?? 0 }}</p>
+                <p class="text-xs text-gray-500">Ce mois : {{ stats?.orders?.thisMonth ?? 0 }}</p>
               </div>
             </div>
           </div>
@@ -69,11 +75,14 @@
               </div>
               <div>
                 <p class="text-sm text-gray-600">CA du mois</p>
-                <p class="text-2xl font-bold">{{ formatCurrency(stats.revenue) }}</p>
+                <p class="text-2xl font-bold">{{ formatCurrency(stats?.revenue ?? 0) }}</p>
               </div>
             </div>
           </div>
         </div>
+      </div>
+      <div v-else class="text-center text-gray-500">
+        <p>Chargement des statistiques...</p>
       </div>
 
       <!-- Quick Actions -->
@@ -85,38 +94,26 @@
           </div>
           <div class="card-body">
             <div class="grid grid-cols-2 gap-4">
-              <router-link 
-                v-if="canAccess('products:write')"
-                to="/admin/products/new" 
-                class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-center"
-              >
+              <router-link v-if="canAccess('products:write')" to="/admin/products/new"
+                class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-center">
                 <div class="text-2xl mb-2">➕</div>
                 <div class="text-sm font-medium">Nouveau produit</div>
               </router-link>
 
-              <router-link 
-                v-if="canAccess('users:write')"
-                to="/admin/users/new" 
-                class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-center"
-              >
+              <router-link v-if="canAccess('users:write')" to="/admin/users/new"
+                class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-center">
                 <div class="text-2xl mb-2">👤</div>
                 <div class="text-sm font-medium">Nouvel utilisateur</div>
               </router-link>
 
-              <router-link 
-                v-if="canAccess('orders:read')"
-                to="/admin/orders" 
-                class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-center"
-              >
+              <router-link v-if="canAccess('orders:read')" to="/admin/orders"
+                class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-center">
                 <div class="text-2xl mb-2">📋</div>
                 <div class="text-sm font-medium">Voir commandes</div>
               </router-link>
 
-              <router-link 
-                v-if="canAccess('analytics:read')"
-                to="/admin/analytics" 
-                class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-center"
-              >
+              <router-link v-if="canAccess('analytics:read')" to="/admin/analytics"
+                class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-center">
                 <div class="text-2xl mb-2">📊</div>
                 <div class="text-sm font-medium">Analytics</div>
               </router-link>
@@ -190,15 +187,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '../../stores/auth'
+import  apiClient from '@/services/api'
 
 const authStore = useAuthStore()
 
-const stats = ref({
-  users: 0,
-  products: 0,
-  orders: 0,
-  revenue: 0
-})
+const stats = ref<any>(null)
+const loading = ref(true)
 
 const recentActivity = ref([
   {
@@ -220,7 +214,7 @@ const recentActivity = ref([
 
 const canAccess = (permission: string) => {
   const userRole = authStore.user?.role
-  
+
   const permissions: Record<string, string[]> = {
     'products:read': ['ROLE_ADMIN', 'ROLE_STORE_KEEPER', 'ROLE_USER'],
     'products:write': ['ROLE_ADMIN', 'ROLE_STORE_KEEPER'],
@@ -228,7 +222,7 @@ const canAccess = (permission: string) => {
     'orders:read': ['ROLE_ADMIN', 'ROLE_COMPTA', 'ROLE_STORE_KEEPER'],
     'analytics:read': ['ROLE_ADMIN', 'ROLE_COMPTA']
   }
-  
+
   return permissions[permission]?.includes(userRole || '') || false
 }
 
@@ -249,16 +243,19 @@ const formatDate = (date: Date) => {
 }
 
 const refreshData = async () => {
-  // Simuler le chargement des stats
-  stats.value = {
-    users: 156,
-    products: 89,
-    orders: 234,
-    revenue: 45678.90
+  loading.value = true
+  try {
+    const response = await apiClient.get('/admin/dashboard')
+    console.log('DASHBOARD DATA', response.data)
+    if (response.data.success) {
+      stats.value = response.data.data
+    }
+  } catch (e) {
+    stats.value = null
+  } finally {
+    loading.value = false
   }
 }
 
-onMounted(() => {
-  refreshData()
-})
-</script> 
+onMounted(refreshData)
+</script>

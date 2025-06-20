@@ -24,7 +24,7 @@ router.get('/dashboard', authenticate, requirePermission('analytics:read'), asyn
       },
       products: {
         total: await Product.count(),
-        active: await Product.count({ where: { isActive: true } }),
+        //active: await Product.count({ where: { isActive: true } }),
         lowStock: await Product.count({
           where: {
             stockQuantity: { [Op.lt]: 10 }
@@ -41,7 +41,13 @@ router.get('/dashboard', authenticate, requirePermission('analytics:read'), asyn
             }
           }
         })
-      }
+      },
+      revenue: await Order.sum('total', {
+        where: {
+          status: 'pending',
+          createdAt: { [Op.gte]: new Date(new Date().getFullYear(), new Date().getMonth(), 1) }
+        }
+      }) || 0
     };
 
     res.json({
@@ -122,7 +128,7 @@ router.get('/users', authenticate, requirePermission('users:read'), async (req, 
 router.patch('/users/:id/toggle-status', authenticate, requirePermission('users:write'), async (req, res) => {
   try {
     const user = await User.findByPk(req.params.id);
-    
+
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -134,9 +140,9 @@ router.patch('/users/:id/toggle-status', authenticate, requirePermission('users:
       isActive: !user.isActive
     });
 
-    logger.info(`User status toggled: ${req.params.id}`, { 
+    logger.info(`User status toggled: ${req.params.id}`, {
       adminId: req.user.id,
-      newStatus: user.isActive 
+      newStatus: user.isActive
     });
 
     res.json({

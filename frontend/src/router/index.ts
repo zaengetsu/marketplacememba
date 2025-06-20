@@ -114,6 +114,30 @@ const router = createRouter({
       name: "VerifyEmail",
       component: () => import("@/views/VerifyEmailView.vue"),
     },
+    {
+      path: "/admin/users",
+      name: "admin-users",
+      component: () => import("@/views/admin/AdminUsersView.vue"),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+      path: "/admin/users/new",
+      name: "admin-user-create",
+      component: () => import("@/views/admin/AdminUserForm.vue"),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+      path: "/admin/orders",
+      name: "admin-orders",
+      component: () => import("@/views/admin/AdminOrdersView.vue"),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+      path: "/admin/analytics",
+      name: "admin-analytics",
+      component: () => import("@/views/admin/AdminAnalyticsView.vue"),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
   ],
 });
 
