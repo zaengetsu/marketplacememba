@@ -139,10 +139,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useOrderStore, type Order } from '@/stores/orders'
-import { useCartStore } from '@/stores/cart'
+// import { useCartStore } from '@/stores/cart'
 
 const orderStore = useOrderStore()
-const cartStore = useCartStore()
+// const cartStore = useCartStore()
 const selectedOrder = ref<Order | null>(null)
 const pagination = ref<any>(null)
 

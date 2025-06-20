@@ -294,7 +294,7 @@ const personalForm = useForm({
     birthDate: ''
   },
   validationSchema: personalInfoSchema,
-  onSubmit: async (data) => {
+  onSubmit: async () => {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000))
     toast.success('Informations personnelles mises à jour')

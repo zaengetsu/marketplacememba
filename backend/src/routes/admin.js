@@ -160,4 +160,78 @@ router.patch('/users/:id/toggle-status', authenticate, requirePermission('users:
   }
 });
 
+// Nouveaux utilisateurs par jour (7 derniers jours)
+router.get('/stats/users-per-day', authenticate, requirePermission('analytics:read'), async (req, res) => {
+  const { User } = require('../../models');
+  const { Op } = require('sequelize');
+  const days = 7;
+  const result = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    const start = new Date(date.setHours(0, 0, 0, 0));
+    const end = new Date(date.setHours(23, 59, 59, 999));
+    const count = await User.count({
+      where: {
+        createdAt: { [Op.between]: [start, end] }
+      }
+    });
+    result.push({ date: start.toISOString().slice(0, 10), count });
+  }
+  res.json({ success: true, data: result });
+});
+
+// Commandes par statut
+router.get('/stats/orders-by-status', authenticate, requirePermission('analytics:read'), async (req, res) => {
+  const { Order } = require('../../models');
+  const statuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
+  const data = {};
+  for (const status of statuses) {
+    data[status] = await Order.count({ where: { status } });
+  }
+  res.json({ success: true, data });
+});
+
+// CA par mois (6 derniers mois)
+router.get('/stats/revenue-per-month', authenticate, requirePermission('analytics:read'), async (req, res) => {
+  const { Order } = require('../../models');
+  const { Op } = require('sequelize');
+  const now = new Date();
+  const result = [];
+  for (let i = 5; i >= 0; i--) {
+    const month = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const nextMonth = new Date(month.getFullYear(), month.getMonth() + 1, 1);
+    const sum = await Order.sum('total', {
+      where: {
+        status: 'delivered',
+        createdAt: { [Op.gte]: month, [Op.lt]: nextMonth }
+      }
+    });
+    result.push({ month: month.toISOString().slice(0, 7), revenue: sum || 0 });
+  }
+  res.json({ success: true, data: result });
+});
+
+// GET /api/admin/orders - Liste des commandes (avec utilisateur)
+router.get('/orders', authenticate, requirePermission('orders:read'), async (req, res) => {
+  try {
+    const { Order, User } = require('../../models');
+    const orders = await Order.findAll({
+      include: [
+        { model: User, attributes: ['firstName', 'lastName'] }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+    res.json({
+      success: true,
+      data: { orders }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Erreur lors de la récupération des commandes'
+    });
+  }
+});
+
 module.exports = router; 

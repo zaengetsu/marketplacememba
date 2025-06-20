@@ -117,6 +117,12 @@
                 <div class="text-2xl mb-2">📊</div>
                 <div class="text-sm font-medium">Analytics</div>
               </router-link>
+
+              <router-link v-if="canAccess('analytics:read')" to="/admin/users"
+                class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-center">
+                <div class="text-2xl mb-2">📖</div>
+                <div class="text-sm font-medium">liste des utilisateurs</div>
+              </router-link>
             </div>
           </div>
         </div>
