@@ -17,12 +17,7 @@
         <div class="card-body">
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <input 
-                v-model="searchQuery"
-                type="text" 
-                placeholder="Rechercher un produit..."
-                class="form-input"
-              >
+              <input v-model="searchQuery" type="text" placeholder="Rechercher un produit..." class="form-input">
             </div>
             <div>
               <select v-model="selectedCategory" class="form-select">
@@ -82,15 +77,12 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="product in filteredProducts" :key="product._id" class="hover:bg-gray-50">
+              <tr v-for="product in paginatedProducts" :key="product._id" class="hover:bg-gray-50">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
                     <div class="flex-shrink-0 h-12 w-12">
-                      <img 
-                        :src="product.images[0]?.url || '/placeholder.jpg'" 
-                        :alt="product.name"
-                        class="h-12 w-12 rounded-lg object-cover"
-                      >
+                      <img :src="product.images[0]?.url || '/placeholder.jpg'" :alt="product.name"
+                        class="h-12 w-12 rounded-lg object-cover">
                     </div>
                     <div class="ml-4">
                       <div class="text-sm font-medium text-gray-900">{{ product.name }}</div>
@@ -112,49 +104,32 @@
                   </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <span 
-                    class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
-                    :class="getStockClass(product.stock.quantity)"
-                  >
+                  <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                    :class="getStockClass(product.stock.quantity)">
                     {{ product.stock.quantity }} unités
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <span 
-                    class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
-                    :class="getStatusClass(product.status)"
-                  >
-                    {{ getStatusLabel(product.status) }}
+                  <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                    :class="getStatusClass(product.status ?? '')">
+                    {{ getStatusLabel(product.status ?? '') }}
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div class="flex space-x-2">
-                    <button 
-                      @click="viewProduct(product)"
-                      class="text-blue-600 hover:text-blue-900"
-                      title="Voir"
-                    >
+                    <button @click="viewProduct(product)" class="text-blue-600 hover:text-blue-900" title="Voir">
                       👁️
                     </button>
-                    <router-link 
-                      :to="`/admin/products/${product._id}/edit`"
-                      class="text-indigo-600 hover:text-indigo-900"
-                      title="Modifier"
-                    >
+                    <router-link :to="`/admin/products/${product._id}/edit`"
+                      class="text-indigo-600 hover:text-indigo-900" title="Modifier">
                       ✏️
                     </router-link>
-                    <button 
-                      @click="toggleProductStatus(product)"
+                    <button @click="toggleProductStatus(product)"
                       :class="product.isActive ? 'text-orange-600 hover:text-orange-900' : 'text-green-600 hover:text-green-900'"
-                      :title="product.isActive ? 'Désactiver' : 'Activer'"
-                    >
+                      :title="product.isActive ? 'Désactiver' : 'Activer'">
                       {{ product.isActive ? '⏸️' : '▶️' }}
                     </button>
-                    <button 
-                      @click="deleteProduct(product)"
-                      class="text-red-600 hover:text-red-900"
-                      title="Supprimer"
-                    >
+                    <button @click="deleteProduct(product)" class="text-red-600 hover:text-red-900" title="Supprimer">
                       🗑️
                     </button>
                   </div>
@@ -168,25 +143,17 @@
       <!-- Pagination -->
       <div v-if="totalPages > 1" class="flex justify-center mt-6">
         <div class="flex space-x-2">
-          <button 
-            @click="currentPage--"
-            :disabled="currentPage === 1"
-            class="btn btn-outline"
-            :class="{ 'opacity-50 cursor-not-allowed': currentPage === 1 }"
-          >
+          <button @click="currentPage--" :disabled="currentPage === 1" class="btn btn-outline"
+            :class="{ 'opacity-50 cursor-not-allowed': currentPage === 1 }">
             Précédent
           </button>
-          
+
           <span class="flex items-center px-4 py-2 text-sm text-gray-600">
             Page {{ currentPage }} sur {{ totalPages }}
           </span>
-          
-          <button 
-            @click="currentPage++"
-            :disabled="currentPage === totalPages"
-            class="btn btn-outline"
-            :class="{ 'opacity-50 cursor-not-allowed': currentPage === totalPages }"
-          >
+
+          <button @click="currentPage++" :disabled="currentPage === totalPages" class="btn btn-outline"
+            :class="{ 'opacity-50 cursor-not-allowed': currentPage === totalPages }">
             Suivant
           </button>
         </div>
@@ -198,7 +165,7 @@
       <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
         <h3 class="text-lg font-semibold mb-4">Confirmer la suppression</h3>
         <p class="text-gray-600 mb-6">
-          Êtes-vous sûr de vouloir supprimer le produit "{{ productToDelete.name }}" ? 
+          Êtes-vous sûr de vouloir supprimer le produit "{{ productToDelete.name }}" ?
           Cette action est irréversible.
         </p>
         <div class="flex space-x-3">
@@ -213,33 +180,28 @@
     </div>
 
     <!-- Modal de détail produit -->
-    <ProductModal 
-      v-if="selectedProduct"
-      :product="selectedProduct"
-      @close="selectedProduct = null"
-      @add-to-cart="() => {}"
-    />
+    <ProductModal v-if="selectedProduct" :product="selectedProduct" @close="selectedProduct = null"
+      @add-to-cart="() => { }" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useToast } from 'vue-toastification'
-import type { Product } from '../../types/product'
+// import type { Product } from '../../types/product'
+import type { ProductDisplay } from '../../types/product'
 import ProductModal from '../../components/ProductModal.vue'
+import { productService } from '@/services/api'
+import { categoryService } from '@/services/api'
 
 const toast = useToast()
 
 // État
-const products = ref<Product[]>([])
-const categories = ref([
-  { id: 1, name: 'Électronique' },
-  { id: 2, name: 'Mode' },
-  { id: 3, name: 'Maison & Jardin' }
-])
+const products = ref<ProductDisplay[]>([])
+const categories = ref<{ id: number | string, name: string }[]>([])
 const loading = ref(true)
-const selectedProduct = ref<Product | null>(null)
-const productToDelete = ref<Product | null>(null)
+const selectedProduct = ref<ProductDisplay | null>(null)
+const productToDelete = ref<ProductDisplay | null>(null)
 
 // Filtres
 const searchQuery = ref('')
@@ -250,59 +212,85 @@ const selectedStatus = ref('')
 const currentPage = ref(1)
 const itemsPerPage = 10
 
-// Données de démonstration
-const mockProducts: Product[] = [
-  {
-    _id: '1',
-    name: 'iPhone 15 Pro',
-    description: 'Le dernier smartphone Apple avec puce A17 Pro',
-    price: 1229,
-    salePrice: 1099,
-    isOnSale: true,
-    stock: { quantity: 50, reserved: 0, lowStockThreshold: 5 },
-    images: [{ url: '/phone.jpg', alt: 'iPhone', isPrimary: true }],
-    category: { id: '1', name: 'Électronique', slug: 'electronique' },
-    slug: 'iphone-15-pro',
-    status: 'active',
-    isActive: true,
-    rating: { average: 4.8, count: 120 },
-    salesCount: 50,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  },
-  {
-    _id: '2',
-    name: 'MacBook Air M3',
-    description: 'Ordinateur portable ultra-fin avec puce M3',
-    price: 1299,
-    isOnSale: false,
-    stock: { quantity: 3, reserved: 0, lowStockThreshold: 5 },
-    images: [{ url: '/macbook.jpg', alt: 'MacBook', isPrimary: true }],
-    category: { id: '1', name: 'Électronique', slug: 'electronique' },
-    slug: 'macbook-air-m3',
-    status: 'active',
-    isActive: true,
-    rating: { average: 4.6, count: 85 },
-    salesCount: 30,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
+// Mapping pour adapter la structure backend -> front
+function mapProductFromApi(apiProduct: any): ProductDisplay {
+  return {
+    ...apiProduct,
+    _id: apiProduct.id?.toString() ?? '', // pour la clé du template
+    images: Array.isArray(apiProduct.images) ? apiProduct.images : [],
+    stock: {
+      quantity: apiProduct.stockQuantity ?? 0,
+      reserved: apiProduct.stock?.reserved ?? 0,
+      lowStockThreshold: apiProduct.stock?.lowStockThreshold ?? 5
+    },
+    category: apiProduct.category
+      ? {
+          id: apiProduct.category.id?.toString() ?? '',
+          name: apiProduct.category.name ?? '',
+          slug: apiProduct.category.slug ?? '',
+          description: apiProduct.category.description ?? '',
+          isActive: apiProduct.category.isActive ?? true,
+          createdAt: apiProduct.category.createdAt ?? '',
+          updatedAt: apiProduct.category.updatedAt ?? ''
+        }
+      : {
+          id: apiProduct.categoryId?.toString() ?? '',
+          name: '',
+          slug: '',
+          description: '',
+          isActive: true,
+          createdAt: '',
+          updatedAt: ''
+        },
+    status: apiProduct.status ?? 'active',
+    isActive: apiProduct.isActive ?? true,
+    rating: apiProduct.rating ?? { average: 0, count: 0 },
+    salesCount: apiProduct.salesCount ?? 0,
   }
-]
+}
+
+// Chargement des catégories et produits
+const loadProducts = async () => {
+  loading.value = true
+  try {
+    const response = await productService.getProducts()
+    products.value = (response.data?.products || []).map(mapProductFromApi)
+  } catch (error) {
+    toast.error('Erreur lors du chargement des produits')
+  } finally {
+    loading.value = false
+  }
+}
+
+const loadCategories = async () => {
+  try {
+    const response = await categoryService.getCategories()
+    if (response.success && response.data) {
+      categories.value = response.data
+    }
+  } catch (error) {
+    toast.error('Erreur lors du chargement des catégories')
+  }
+}
+
+onMounted(async () => {
+  await loadCategories()
+  await loadProducts()
+})
 
 // Produits filtrés
 const filteredProducts = computed(() => {
   let filtered = products.value
 
   if (searchQuery.value) {
-    filtered = filtered.filter(product => 
+    filtered = filtered.filter(product =>
       product.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
       product.description.toLowerCase().includes(searchQuery.value.toLowerCase())
     )
   }
 
   if (selectedCategory.value) {
-    filtered = filtered.filter(product => product.category.id === selectedCategory.value)
-  }
+filtered = filtered.filter(product => String(product.category.id) === String(selectedCategory.value))  }
 
   if (selectedStatus.value) {
     filtered = filtered.filter(product => product.status === selectedStatus.value)
@@ -345,23 +333,22 @@ const getStatusLabel = (status: string) => {
 }
 
 // Actions
-const viewProduct = (product: Product) => {
+const viewProduct = (product: ProductDisplay) => {
   selectedProduct.value = product
 }
 
-const toggleProductStatus = async (product: Product) => {
+const toggleProductStatus = async (product: ProductDisplay) => {
   try {
     // Simuler l'appel API
     product.isActive = !product.isActive
     product.status = product.isActive ? 'active' : 'inactive'
-    
     toast.success(`Produit ${product.isActive ? 'activé' : 'désactivé'} avec succès`)
   } catch (error) {
     toast.error('Erreur lors de la modification du statut')
   }
 }
 
-const deleteProduct = (product: Product) => {
+const deleteProduct = (product: ProductDisplay) => {
   productToDelete.value = product
 }
 
@@ -369,12 +356,8 @@ const confirmDelete = async () => {
   if (!productToDelete.value) return
 
   try {
-    // Simuler l'appel API
-    const index = products.value.findIndex(p => p._id === productToDelete.value!._id)
-    if (index > -1) {
-      products.value.splice(index, 1)
-    }
-    
+    await productService.deleteProduct(productToDelete.value._id)
+    await loadProducts() // Recharge la liste après suppression
     toast.success('Produit supprimé avec succès')
     productToDelete.value = null
   } catch (error) {
@@ -388,12 +371,4 @@ const resetFilters = () => {
   selectedStatus.value = ''
   currentPage.value = 1
 }
-
-onMounted(() => {
-  // Simuler le chargement des produits
-  setTimeout(() => {
-    products.value = mockProducts
-    loading.value = false
-  }, 1000)
-})
-</script> 
+</script>

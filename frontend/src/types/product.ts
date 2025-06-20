@@ -25,19 +25,20 @@ export interface Category {
 
 // Types pour l'affichage frontend (avec images et données supplémentaires)
 export interface ProductDisplay extends Product {
-  images: {
-    url: string
-    alt: string
-    isPrimary: boolean
-  }[]
-  stock: {
-    quantity: number
-    reserved: number
-    lowStockThreshold: number
-  }
-  rating?: {
-    average: number
-    count: number
-  }
+  images: { url: string; alt: string; isPrimary: boolean }[]
+  stock: { quantity: number; reserved: number; lowStockThreshold: number }
+  rating?: { average: number; count: number }
   salesCount?: number
-} 
+  status?: string
+  isActive?: boolean
+  _id?: string // Ajoute cette ligne pour la clé du template
+  category: {
+    id: number
+    name: string
+    slug: string
+    description: string
+    isActive: boolean
+    createdAt: string
+    updatedAt: string
+  }
+}
