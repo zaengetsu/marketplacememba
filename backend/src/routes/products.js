@@ -5,6 +5,9 @@ const { Product, Category } = require('../../models');
 const { authenticate } = require('../middlewares/auth');
 const { requirePermission } = require('../middlewares/roleAuth');
 const logger = require('../utils/logger');
+const { User } = require('../../models');
+const emailService = require('../services/emailService');
+
 
 // GET /api/products - Liste des produits (public)
 router.get('/', async (req, res) => {
@@ -207,6 +210,13 @@ router.post('/', authenticate, requirePermission('products:write'), async (req, 
       ]
     });
 
+    // Notifier tous les utilisateurs actifs (hors admin)
+    const users = await User.findAll({ where: { isActive: true, role: 'ROLE_USER' } });
+    for (const user of users) {
+      // Envoi sans await pour ne pas bloquer la réponse
+      emailService.sendNewProductAlert(user.email, createdProduct, user);
+    }
+
     logger.info(`Product created: ${product.id}`, { userId: req.user.id });
 
     res.status(201).json({
@@ -217,7 +227,7 @@ router.post('/', authenticate, requirePermission('products:write'), async (req, 
 
   } catch (error) {
     logger.error('Error creating product:', error);
-    
+
     if (error.name === 'SequelizeUniqueConstraintError') {
       return res.status(400).json({
         success: false,

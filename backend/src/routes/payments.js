@@ -4,7 +4,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { authenticate } = require('../middlewares/auth');
 const { Order, OrderItem, Product } = require('../../models');
 const logger = require('../utils/logger');
-const generateInvoicePDF = require('../utils/invoicePdf')
+const generateInvoicePDF = require('../utils/invoicePDF')
 
 
 // POST /api/payments/create-intent - Créer une intention de paiement Stripe

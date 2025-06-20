@@ -79,22 +79,109 @@ class EmailService {
 
   async sendAccountLockedEmail(email, userData) {
     if (!this.isEnabled) return;
-    // À implémenter si besoin
+
+    const name = userData?.firstName
+      ? `${userData.firstName} ${userData.lastName || ''}`.trim()
+      : 'client';
+
+    const mailOptions = {
+      from: process.env.MAIL_USER,
+      to: email,
+      subject: "Votre compte a été verrouillé",
+      text: `Bonjour ${name},\n\nVotre compte a été verrouillé suite à plusieurs tentatives de connexion échouées. Merci de contacter le support pour le réactiver.\n\nCordialement,\nL'équipe Marketplace`,
+      html: `<p>Bonjour <b>${name}</b>,</p>
+           <p>Votre compte a été <b>verrouillé</b> suite à plusieurs tentatives de connexion échouées.</p>
+           <p>Merci de contacter le support pour le réactiver.</p>
+           <p>Cordialement,<br>L'équipe Marketplace</p>`
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+      logger.info(`📧 Email de compte verrouillé envoyé à ${email}`);
+    } catch (error) {
+      logger.error('❌ Erreur lors de l’envoi de l’email de compte verrouillé :', error);
+    }
   }
 
   async sendNewProductAlert(email, product, userData) {
     if (!this.isEnabled) return;
-    // À implémenter si besoin
+
+    const name = userData?.firstName
+      ? `${userData.firstName} ${userData.lastName || ''}`.trim()
+      : 'client';
+
+    const mailOptions = {
+      from: process.env.MAIL_USER,
+      to: email,
+      subject: `Nouveau produit disponible : ${product.name}`,
+      text: `Bonjour ${name},\n\nUn nouveau produit "${product.name}" est maintenant disponible sur notre boutique !\n\nDescription : ${product.description}\nPrix : ${product.price} €\n\nVenez vite le découvrir !\n\nCordialement,\nL'équipe Marketplace`,
+      html: `<p>Bonjour <b>${name}</b>,</p>
+           <p>Un nouveau produit <b>${product.name}</b> est maintenant disponible sur notre boutique !</p>
+           <p>Description : ${product.description}<br>Prix : <b>${product.price} €</b></p>
+           <p><a href="${process.env.FRONTEND_URL}/product/${product.id}">Voir le produit</a></p>
+           <p>Cordialement,<br>L'équipe Marketplace</p>`
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+      logger.info(`📧 Alerte nouveau produit envoyée à ${email}`);
+    } catch (error) {
+      logger.error('❌ Erreur lors de l’envoi de l’alerte nouveau produit :', error);
+    }
   }
 
   async sendRestockAlert(email, product, userData) {
     if (!this.isEnabled) return;
-    // À implémenter si besoin
+
+    const name = userData?.firstName
+      ? `${userData.firstName} ${userData.lastName || ''}`.trim()
+      : 'client';
+
+    const mailOptions = {
+      from: process.env.MAIL_USER,
+      to: email,
+      subject: `Produit de retour en stock : ${product.name}`,
+      text: `Bonjour ${name},\n\nLe produit "${product.name}" est de nouveau disponible !\n\nPrix : ${product.price} €\n\nProfitez-en vite !\n\nCordialement,\nL'équipe Marketplace`,
+      html: `<p>Bonjour <b>${name}</b>,</p>
+           <p>Le produit <b>${product.name}</b> est de nouveau disponible !</p>
+           <p>Prix : <b>${product.price} €</b></p>
+           <p><a href="${process.env.FRONTEND_URL}/product/${product.id}">Voir le produit</a></p>
+           <p>Cordialement,<br>L'équipe Marketplace</p>`
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+      logger.info(`📧 Alerte restock envoyée à ${email}`);
+    } catch (error) {
+      logger.error('❌ Erreur lors de l’envoi de l’alerte restock :', error);
+    }
   }
 
   async sendPriceChangeAlert(email, product, oldPrice, userData) {
     if (!this.isEnabled) return;
-    // À implémenter si besoin
+
+    const name = userData?.firstName
+      ? `${userData.firstName} ${userData.lastName || ''}`.trim()
+      : 'client';
+
+    const mailOptions = {
+      from: process.env.MAIL_USER,
+      to: email,
+      subject: `Changement de prix : ${product.name}`,
+      text: `Bonjour ${name},\n\nLe prix du produit "${product.name}" a changé :\nAncien prix : ${oldPrice} €\nNouveau prix : ${product.price} €\n\nProfitez-en !\n\nCordialement,\nL'équipe Marketplace`,
+      html: `<p>Bonjour <b>${name}</b>,</p>
+           <p>Le prix du produit <b>${product.name}</b> a changé !</p>
+           <p>Ancien prix : <s>${oldPrice} €</s><br>Nouveau prix : <b>${product.price} €</b></p>
+           <p><a href="${process.env.FRONTEND_URL}/product/${product.id}">Voir le produit</a></p>
+           <p>Cordialement,<br>L'équipe Marketplace</p>`
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+      logger.info(`📧 Alerte changement de prix envoyée à ${email}`);
+    } catch (error) {
+      logger.error('❌ Erreur lors de l’envoi de l’alerte changement de prix :', error);
+    }
   }
 
   async sendOrderConfirmation(email, order, user, invoicePath) {
@@ -140,10 +227,10 @@ L'équipe Marketplace
         <p style="margin-top:32px;">Cordialement,<br>L'équipe Marketplace</p>
       </div>
     `,
-    attachments: invoicePath ? [{
-      filename: `facture-${order.id}.pdf`,
-      path: invoicePath
-    }] : []
+      attachments: invoicePath ? [{
+        filename: `facture-${order.id}.pdf`,
+        path: invoicePath
+      }] : []
     };
 
     try {
