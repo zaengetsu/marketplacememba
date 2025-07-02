@@ -158,6 +158,13 @@ const resetPassword = async (token: string, password: string) => {
   }
 }
 
+  const updateUser = async (userData: Partial<User>) => {
+    if (user.value) {
+      user.value = { ...user.value, ...userData }
+      localStorage.setItem('auth_user', JSON.stringify(user.value))
+    }
+  }
+
   return {
     user,
     token,
@@ -172,6 +179,7 @@ const resetPassword = async (token: string, password: string) => {
     checkAuth,
     refreshUserProfile,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    updateUser
   }
-}) 
+})

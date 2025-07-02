@@ -291,7 +291,7 @@ router.post('/forgot-password', async (req, res) => {
 
     // Envoie l'email avec le lien de réinitialisation
     const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
-    await emailService.sendPasswordResetEmail(user.email, resetToken, user);
+    await emailService.sendPasswordResetEmail(user.email, resetToken);
 
     res.json({ success: true, message: 'Un email de réinitialisation a été envoyé.' });
   } catch (error) {
@@ -412,5 +412,26 @@ router.post('/verify-email', async (req, res) => {
   res.json({ success: true, message: 'Email vérifié !' });
 });
 
+// Route temporaire de développement pour activer les comptes
+if (process.env.NODE_ENV === 'development') {
+  router.post('/dev/activate-email', async (req, res) => {
+    try {
+      const { email } = req.body;
+      const user = await User.findOne({ where: { email } });
+      
+      if (!user) {
+        return res.status(404).json({ success: false, error: 'Utilisateur non trouvé' });
+      }
+      
+      user.isEmailVerified = true;
+      user.emailVerificationToken = null;
+      await user.save();
+      
+      res.json({ success: true, message: `Email activé pour ${email}` });
+    } catch (error) {
+      res.status(500).json({ success: false, error: 'Erreur serveur' });
+    }
+  });
+}
 
-module.exports = router; 
+module.exports = router;
