@@ -204,8 +204,8 @@ router.post('/create-checkout-session', authenticate, async (req, res) => {
 
     console.log('✅ ORDER FOUND:', order.id, 'avec', order.orderItems.length, 'articles');
 
-    // En mode développement, on peut simuler le checkout
-    if (process.env.NODE_ENV === 'development') {
+    // En mode développement, on peut simuler le checkout (désactivé pour les tests)
+    if (process.env.NODE_ENV === 'development' && process.env.STRIPE_SIMULATION === 'true') {
       // Simulation d'une session de paiement
       const simulatedSession = {
         id: 'cs_simulation_' + Date.now(),
