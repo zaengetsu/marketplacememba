@@ -19,10 +19,10 @@ RUN mkdir -p logs
 
 # Variables d'environnement par défaut
 ENV NODE_ENV=development
-ENV PORT=3000
+ENV PORT=4000
 
 # Exposition du port
-EXPOSE 3000
+EXPOSE 4000
 
 # Commande par défaut
 CMD ["npm", "start"] 

@@ -30,7 +30,6 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
-      - ./backend/src/database/init:/docker-entrypoint-initdb.d
     networks:
       - ecommerce-network
 
@@ -54,12 +53,15 @@ services:
     container_name: ecommerce-backend
     restart: always
     ports:
-      - "3000:3000"
+      - "4000:4000"
+    environment:
+      - PORT=4000
     env_file:
-       ./backend/.env
+      - ./backend/.env
     volumes:
       - ./backend:/app
       - /app/node_modules
+      - backend_uploads:/app/uploads  # ← Volume persistant pour les uploads
     depends_on:
       - postgres
       - mongodb
@@ -67,6 +69,7 @@ services:
     networks:
       - ecommerce-network
     command: npm run dev
+
   # Frontend VueJS
   frontend:
     build:
@@ -77,8 +80,8 @@ services:
     ports:
       - "5173:5173"
     environment:
-      VITE_API_URL: http://localhost:3000/api
-      VITE_STRIPE_PUBLIC_KEY: pk_test_your_stripe_public_key
+      - VITE_API_URL=http://localhost:4000/api  # ← Nom du service Docker
+      - VITE_STRIPE_PUBLIC_KEY=pk_test_your_stripe_public_key
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -92,7 +95,8 @@ volumes:
   postgres_data:
   mongodb_data:
   redis_data:
+  backend_uploads:  # ← Volume pour les uploads
 
 networks:
   ecommerce-network:
-    driver: bridge 
+    driver: bridge

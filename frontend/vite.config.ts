@@ -10,9 +10,10 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/api": {
-      target: 'http://ecommerce-backend:3000',
+      target: 'http://localhost:4000',
         changeOrigin: true,
         secure: false,
+        timeout: 10000,
       },
     },
   },

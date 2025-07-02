@@ -8,6 +8,38 @@ const logger = require('../utils/logger');
 const { User } = require('../../models');
 const emailService = require('../services/emailService');
 
+// Ajouter ces imports pour l'upload
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// Configuration multer pour l'upload d'images
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = 'uploads/products/';
+    // Créer le dossier s'il n'existe pas
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(file.originalname);
+    cb(null, uniqueName);
+  }
+});
+
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Seules les images sont autorisées'), false);
+    }
+  }
+});
 
 // GET /api/products - Liste des produits (public)
 router.get('/', async (req, res) => {
@@ -145,7 +177,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/products - Créer un produit (Admin/Store Keeper)
-router.post('/', authenticate, requirePermission('products:write'), async (req, res) => {
+router.post('/', authenticate, requirePermission('products:write'), upload.array('images', 5), async (req, res) => {
   try {
     const {
       name,
@@ -155,7 +187,6 @@ router.post('/', authenticate, requirePermission('products:write'), async (req, 
       salePrice,
       isOnSale = false,
       stockQuantity = 0,
-      images = [],
       status = 'draft',
       isActive = false
     } = req.body;
@@ -176,6 +207,9 @@ router.post('/', authenticate, requirePermission('products:write'), async (req, 
         message: 'Catégorie non trouvée'
       });
     }
+
+    // Traiter les images uploadées
+    const images = req.files ? req.files.map(file => `/uploads/products/${file.filename}`) : [];
 
     // Générer le slug
     const slug = name
@@ -241,7 +275,6 @@ router.post('/', authenticate, requirePermission('products:write'), async (req, 
     });
   }
 });
-
 // PUT /api/products/:id - Modifier un produit (Admin/Store Keeper)
 router.put('/:id', authenticate, requirePermission('products:write'), async (req, res) => {
   try {

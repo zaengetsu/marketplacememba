@@ -115,35 +115,47 @@
             </div>
 
             <!-- Images -->
+            <!-- Images -->
             <div class="card">
               <div class="card-header">
                 <h2 class="text-xl font-semibold">Images du produit</h2>
               </div>
               <div class="card-body space-y-4">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div v-for="(image, index) in data.images" :key="index" class="relative group">
-                    <img :src="image.url" :alt="image.alt" class="w-full h-24 object-cover rounded border">
-                    <button @click="removeImage(index)" type="button"
-                      class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      ×
-                    </button>
-                    <div v-if="image.isPrimary"
-                      class="absolute bottom-1 left-1 bg-blue-500 text-white text-xs px-1 rounded">
-                      Principal
+                <!-- Zone d'upload -->
+                <div
+                  class="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-400 transition-colors">
+                  <input ref="fileInput" type="file" multiple accept="image/*" @change="handleFileUpload"
+                    class="hidden" />
+                  <button type="button" @click="triggerImageUpload"
+                    class="w-full flex flex-col items-center justify-center py-4 text-gray-600 hover:text-blue-600 transition-colors">
+                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                      </path>
+                    </svg>
+                    <span class="text-lg font-medium">Cliquez pour ajouter des images</span>
+                    <span class="text-sm text-gray-500 mt-1">PNG, JPG, GIF jusqu'à 5MB (max 5 images)</span>
+                  </button>
+                </div>
+
+                <!-- Prévisualisation des images -->
+                <div v-if="imageFiles.length > 0" class="mt-6">
+                  <h3 class="text-sm font-medium text-gray-700 mb-3">Images sélectionnées ({{ imageFiles.length }}/5)
+                  </h3>
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div v-for="(file, index) in imageFiles" :key="index" class="relative group">
+                      <img :src="file.preview" :alt="`Preview ${index + 1}`"
+                        class="w-full h-24 object-cover rounded border shadow-sm">
+                      <button type="button" @click="removeImage(index)"
+                        class="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm transition-colors opacity-0 group-hover:opacity-100">
+                        ×
+                      </button>
                     </div>
                   </div>
-
-                  <!-- Bouton d'ajout d'image -->
-                  <div
-                    class="border-2 border-dashed border-gray-300 rounded flex items-center justify-center h-24 hover:border-gray-400 cursor-pointer">
-                    <input type="file" @change="addImage" accept="image/*" class="hidden" ref="imageInput">
-                    <button @click="triggerImageUpload" type="button" class="text-gray-500 hover:text-gray-700">
-                      + Ajouter
-                    </button>
-                  </div>
                 </div>
+
                 <p class="text-gray-500 text-sm">
-                  Formats acceptés: JPG, PNG, WebP. Taille max: 2MB par image.
+                  Formats acceptés: JPG, PNG, WebP. Taille max: 5MB par image.
                 </p>
               </div>
             </div>
@@ -231,13 +243,15 @@
   </div>
 </template>
 
+
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+// @ts-nocheck
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useForm, commonSchemas } from '../../composables/useForm'
 import { z } from 'zod'
-import { productService } from '@/services/api' 
+import { productService } from '@/services/api'
 import { categoryService } from '@/services/api'
 
 const route = useRoute()
@@ -245,16 +259,11 @@ const router = useRouter()
 const toast = useToast()
 
 const isEditing = computed(() => !!route.params.id)
-const imageInput = ref<HTMLInputElement>()
+const fileInput = ref<HTMLInputElement>()
+const imageFiles = ref<Array<{ file: File, preview: string }>>([])
 
 // Catégories
-const categories = ref<{ id: number|string, name: string }[]>([])
-onMounted(async () => {
-  const response = await categoryService.getCategories()
-  if (response.success && response.data) {
-    categories.value = response.data
-  }
-})
+const categories = ref<{ id: number | string, name: string }[]>([])
 
 // Schéma de validation
 const productSchema = z.object({
@@ -301,62 +310,107 @@ const { data, errors, isLoading, handleSubmit } = useForm({
   initialData,
   validationSchema: productSchema,
   onSubmit: async (formData) => {
-  try {
-    // Adapter le payload pour le backend
-    const payload = {
-      ...formData,
-      categoryId: Number(formData.categoryId),
-      stockQuantity: formData.stock.quantity,
-      images: formData.images,
-      // Retirer le champ "stock" si le backend ne le gère pas
+    try {
+      if (isEditing.value) {
+        // Mode édition - utiliser PUT classique
+        const payload = {
+          ...formData,
+          categoryId: Number(formData.categoryId),
+          stockQuantity: formData.stock.quantity,
+          images: formData.images,
+        }
+        await productService.updateProduct(route.params.id as string, payload)
+        toast.success('Produit modifié avec succès')
+      } else {
+        // Mode création - utiliser FormData pour l'upload
+        const formDataToSend = new FormData()
+
+        // Ajouter les données du produit
+        formDataToSend.append('name', formData.name)
+        formDataToSend.append('description', formData.description)
+        formDataToSend.append('categoryId', String(formData.categoryId))
+        formDataToSend.append('price', String(formData.price))
+        if (formData.salePrice) formDataToSend.append('salePrice', String(formData.salePrice))
+        formDataToSend.append('isOnSale', String(formData.isOnSale))
+        formDataToSend.append('stockQuantity', String(formData.stock.quantity))
+        formDataToSend.append('status', formData.status)
+        formDataToSend.append('isActive', String(formData.isActive))
+
+        // Ajouter les images
+        imageFiles.value.forEach(({ file }) => {
+          formDataToSend.append('images', file)
+        })
+
+        // Appel direct à l'API pour gérer FormData
+        const token = localStorage.getItem('token')
+        const response = await fetch('/api/products', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formDataToSend
+        })
+
+        if (!response.ok) {
+          const error = await response.json()
+          throw new Error(error.message || 'Erreur lors de la création')
+        }
+
+        toast.success('Produit créé avec succès')
+      }
+      router.push('/admin/products')
+    } catch (error) {
+      console.error('Error saving product:', error)
+      toast.error('Erreur lors de la sauvegarde')
     }
-    if (isEditing.value) {
-      await productService.updateProduct(route.params.id as string, payload)
-      toast.success('Produit modifié avec succès')
-    } else {
-      await productService.createProduct(payload)
-      toast.success('Produit créé avec succès')
-    }
-    router.push('/admin/products')
-  } catch (error) {
-    toast.error('Erreur lors de la sauvegarde')
   }
-}
 })
+
+// Fonctions pour les images
+const handleFileUpload = (event: Event) => {
+  const files = Array.from((event.target as HTMLInputElement).files || [])
+
+  // Limiter à 5 images max
+  const remainingSlots = 5 - imageFiles.value.length
+  const filesToAdd = files.slice(0, remainingSlots)
+
+  filesToAdd.forEach(file => {
+    if (file.type.startsWith('image/')) {
+      // Vérifier la taille (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`L'image ${file.name} est trop volumineuse (max 5MB)`)
+        return
+      }
+
+      const preview = URL.createObjectURL(file)
+      imageFiles.value.push({ file, preview })
+    } else {
+      toast.error(`${file.name} n'est pas une image valide`)
+    }
+  })
+
+  if (files.length > remainingSlots) {
+    toast.warning(`Seulement ${remainingSlots} images peuvent être ajoutées (max 5 total)`)
+  }
+
+  // Reset input
+  ; (event.target as HTMLInputElement).value = ''
+}
+
+const triggerImageUpload = () => {
+  fileInput.value?.click()
+}
+
+const removeImage = (index: number) => {
+  URL.revokeObjectURL(imageFiles.value[index].preview)
+  imageFiles.value.splice(index, 1)
+}
 
 // Actions
 const saveDraft = async () => {
   data.status = 'draft'
   data.isActive = false
   await handleSubmit()
-}
-
-const addImage = (event: Event) => {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (file) {
-    // Simuler l'upload d'image
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      data.images.push({
-        url: e.target?.result as string,
-        alt: data.name || 'Image produit',
-        isPrimary: data.images.length === 0
-      })
-    }
-    reader.readAsDataURL(file)
-  }
-}
-
-const triggerImageUpload = () => {
-  imageInput.value?.click()
-}
-
-const removeImage = (index: number) => {
-  const removedImage = data.images[index]
-  data.images.splice(index, 1)
-  if (removedImage.isPrimary && data.images.length > 0) {
-    data.images[0].isPrimary = true
-  }
 }
 
 // Génération automatique du slug
@@ -369,21 +423,19 @@ const generateSlug = (name: string) => {
     .replace(/^-+|-+$/g, '')
 }
 
-// Watcher pour générer le slug automatiquement
-const unwatchName = () => {
-  if (data.name && !data.slug) {
-    data.slug = generateSlug(data.name)
-  }
-}
-
+// Chargement des données
 onMounted(async () => {
+  // Charger les catégories
+  const response = await categoryService.getCategories()
+  if (response.success && response.data) {
+    categories.value = response.data
+  }
+
+  // Charger le produit en mode édition
   if (isEditing.value) {
-    // Simuler le chargement du produit existant
     const productId = route.params.id
     console.log('Chargement du produit:', productId)
-    // Ici tu peux charger le produit réel via l'API si besoin
-    // const product = await productService.getProduct(productId)
-    // Object.assign(data, product)
+    // Pour le moment, données simulées
     Object.assign(data, {
       name: 'iPhone 15 Pro',
       slug: 'iphone-15-pro',
@@ -403,5 +455,12 @@ onMounted(async () => {
       isActive: true
     })
   }
+})
+
+// Nettoyer les URLs des previews au démontage
+onUnmounted(() => {
+  imageFiles.value.forEach(({ preview }) => {
+    URL.revokeObjectURL(preview)
+  })
 })
 </script>

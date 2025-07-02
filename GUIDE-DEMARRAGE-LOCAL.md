@@ -136,6 +136,39 @@ tail -f backend/logs/app.log
 brew services list | grep -E "(postgresql|mongodb|redis)"
 ```
 
+## 🚀 Déploiement sur un VPS (exemple Ubuntu)
+
+### 1. Préparer le dossier à transférer
+Avant d'envoyer le projet, supprimez les dossiers `node_modules` pour alléger le transfert :
+```bash
+rm -rf backend/node_modules frontend/node_modules
+```
+
+### 2. Transférer le projet sur le VPS
+Utilisez la commande suivante depuis la racine du projet :
+```bash
+scp -r . ubuntu@162.19.78.55:/home/ubuntu/marketplacememba
+```
+
+### 3. Installer les dépendances sur le VPS
+Connectez-vous à votre VPS :
+```bash
+ssh ubuntu@162.19.78.55
+```
+Puis, dans chaque dossier (`backend` et `frontend`) :
+```bash
+cd backend
+npm install
+cd ../frontend
+npm install
+```
+
+### 4. Lancer les conteneurs Docker
+Toujours sur le VPS, à la racine du projet :
+```bash
+docker compose up -d --build
+```
+
 ## 🆘 Support
 
 Si vous rencontrez encore des problèmes :
@@ -148,4 +181,4 @@ Si vous rencontrez encore des problèmes :
 - Les configurations Docker ne sont pas utilisées en mode local
 - Les URLs pointent vers localhost:3000 et localhost:5173
 - Les bases de données doivent tourner en local
-- Les fichiers .env sont requis pour le fonctionnement 
+- Les fichiers .env sont requis pour le fonctionnement
