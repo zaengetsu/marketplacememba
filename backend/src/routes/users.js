@@ -37,7 +37,7 @@ router.get('/profile', authenticate, async (req, res) => {
 // PUT /api/users/profile - Modifier le profil
 router.put('/profile', authenticate, async (req, res) => {
   try {
-    const { firstName, lastName, email, phone, birthDate } = req.body;
+    const { firstName, lastName, email } = req.body;
     
     const user = await User.findByPk(req.user.id);
     
@@ -51,9 +51,7 @@ router.put('/profile', authenticate, async (req, res) => {
     await user.update({
       firstName: firstName || user.firstName,
       lastName: lastName || user.lastName,
-      email: email || user.email,
-      phone: phone || user.phone,
-      birthDate: birthDate || user.birthDate
+      email: email || user.email
     });
 
     res.json({
@@ -63,9 +61,7 @@ router.put('/profile', authenticate, async (req, res) => {
         id: user.id,
         firstName: user.firstName,
         lastName: user.lastName,
-        email: user.email,
-        phone: user.phone,
-        birthDate: user.birthDate
+        email: user.email
       }
     });
 

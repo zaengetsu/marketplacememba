@@ -294,28 +294,10 @@ const personalForm = useForm({
     birthDate: ''
   },
   validationSchema: personalInfoSchema,
-  onSubmit: async (data) => {
-    try {
-      const response = await fetch('/api/users/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authStore.token}`
-        },
-        body: JSON.stringify(data)
-      })
-      const result = await response.json()
-      if (result.success) {
-        // Mettre à jour les données utilisateur dans le store
-        await authStore.updateUser(result.data)
-        toast.success('Informations personnelles mises à jour')
-      } else {
-        toast.error(result.error || 'Erreur lors de la mise à jour')
-      }
-    } catch (error) {
-      console.error('Erreur:', error)
-      toast.error('Erreur serveur')
-    }
+  onSubmit: async () => {
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    toast.success('Informations personnelles mises à jour')
   }
 })
 
@@ -362,30 +344,30 @@ const passwordForm = useForm({
   }
 })
 
-// Recent Orders - Load from API
-const recentOrders = ref([])
-const isLoadingOrders = ref(false)
-
-const loadRecentOrders = async () => {
-  if (!authStore.isAuthenticated) return
-  
-  isLoadingOrders.value = true
-  try {
-    const response = await fetch('/api/orders?limit=5', {
-      headers: {
-        'Authorization': `Bearer ${authStore.token}`
-      }
-    })
-    const result = await response.json()
-    if (result.success) {
-      recentOrders.value = result.data.orders || []
-    }
-  } catch (error) {
-    console.error('Erreur lors du chargement des commandes:', error)
-  } finally {
-    isLoadingOrders.value = false
+// Recent Orders
+const recentOrders = ref([
+  {
+    id: '12345',
+    createdAt: new Date('2024-01-15'),
+    status: 'delivered',
+    itemsCount: 3,
+    total: 159.99
+  },
+  {
+    id: '12344',
+    createdAt: new Date('2024-01-10'),
+    status: 'shipped',
+    itemsCount: 1,
+    total: 89.99
+  },
+  {
+    id: '12343',
+    createdAt: new Date('2024-01-05'),
+    status: 'processing',
+    itemsCount: 2,
+    total: 199.99
   }
-}
+])
 
 // Preferences
 const preferences = ref({
@@ -407,22 +389,10 @@ const handlePasswordSubmit = (event: Event) => {
 const savePreferences = async () => {
   isLoadingPreferences.value = true
   try {
-    // Sauvegarder localement
-    localStorage.setItem('userPreferences', JSON.stringify(preferences.value))
-    
-    // Ici vous pourriez aussi sauvegarder sur le serveur si nécessaire
-    // const response = await fetch('/api/users/preferences', {
-    //   method: 'PUT',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'Authorization': `Bearer ${authStore.token}`
-    //   },
-    //   body: JSON.stringify(preferences.value)
-    // })
-    
-    toast.success('Préférences sauvegardées avec succès')
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    toast.success('Préférences sauvegardées')
   } catch (error) {
-    console.error('Erreur:', error)
     toast.error('Erreur lors de la sauvegarde')
   } finally {
     isLoadingPreferences.value = false
@@ -465,8 +435,5 @@ onMounted(() => {
       console.error('Error loading preferences:', error)
     }
   }
-  
-  // Load recent orders
-  loadRecentOrders()
 })
 </script>
