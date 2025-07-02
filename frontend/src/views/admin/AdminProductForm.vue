@@ -253,10 +253,13 @@ import { useForm, commonSchemas } from '../../composables/useForm'
 import { z } from 'zod'
 import { productService } from '@/services/api'
 import { categoryService } from '@/services/api'
+import { useAuthStore } from '@/stores/auth'
+
 
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
+const authStore = useAuthStore()
 
 const isEditing = computed(() => !!route.params.id)
 const fileInput = ref<HTMLInputElement>()
@@ -342,8 +345,9 @@ const { data, errors, isLoading, handleSubmit } = useForm({
         })
 
         // Appel direct à l'API pour gérer FormData
-        const token = localStorage.getItem('token')
-        const response = await fetch('/api/products', {
+        // const token = localStorage.getItem('token')
+        const token = authStore.token
+        const response = await fetch('http://localhost:4000/api/products', {  // ← URL complète
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`
