@@ -341,11 +341,27 @@ const viewProduct = (product: ProductDisplay) => {
 
 const toggleProductStatus = async (product: ProductDisplay) => {
   try {
-    // Simuler l'appel API
-    product.isActive = !product.isActive
-    product.status = product.isActive ? 'active' : 'inactive'
-    toast.success(`Produit ${product.isActive ? 'activé' : 'désactivé'} avec succès`)
+    const newStatus = !product.isActive
+    const statusValue = newStatus ? 'active' : 'inactive'
+    
+    // Appel API réel pour mettre à jour le produit
+    const productId = product._id || product.id?.toString() || ''
+    if (!productId) {
+      throw new Error('ID du produit manquant')
+    }
+    
+    await productService.updateProduct(productId, {
+      isActive: newStatus,
+      status: statusValue
+    })
+    
+    // Mise à jour locale après succès de l'API
+    product.isActive = newStatus
+    product.status = statusValue
+    
+    toast.success(`Produit ${newStatus ? 'activé' : 'désactivé'} avec succès`)
   } catch (error) {
+    console.error('Erreur lors de la modification du statut:', error)
     toast.error('Erreur lors de la modification du statut')
   }
 }
@@ -358,11 +374,17 @@ const confirmDelete = async () => {
   if (!productToDelete.value) return
 
   try {
-    await productService.deleteProduct(productToDelete.value._id)
+    const productId = productToDelete.value._id || productToDelete.value.id?.toString() || ''
+    if (!productId) {
+      throw new Error('ID du produit manquant')
+    }
+    
+    await productService.deleteProduct(productId)
     await loadProducts() // Recharge la liste après suppression
     toast.success('Produit supprimé avec succès')
     productToDelete.value = null
   } catch (error) {
+    console.error('Erreur lors de la suppression:', error)
     toast.error('Erreur lors de la suppression')
   }
 }

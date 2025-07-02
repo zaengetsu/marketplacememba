@@ -287,6 +287,10 @@ router.post('/', authenticate, requirePermission('products:write'), upload.array
 // PUT /api/products/:id - Modifier un produit (Admin/Store Keeper)
 router.put('/:id', authenticate, requirePermission('products:write'), upload.array('images', 5), async (req, res) => {
   try {
+    console.log('🔄 UPDATE REQUEST - ID:', req.params.id);
+    console.log('🔄 UPDATE REQUEST - BODY:', req.body);
+    console.log('🔄 UPDATE REQUEST - FILES:', req.files);
+
     const product = await Product.findByPk(req.params.id);
 
     if (!product) {

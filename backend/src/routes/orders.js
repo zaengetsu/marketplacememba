@@ -198,4 +198,71 @@ router.get('/admin/all', authenticate, requirePermission('orders:read'), async (
   }
 });
 
+// PUT /api/orders/:id/status - Modifier le statut d'une commande (Admin uniquement)
+router.put('/:id/status', authenticate, requirePermission('orders:write'), async (req, res) => {
+  try {
+    const { status } = req.body;
+    
+    // Statuts valides
+    const validStatuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
+    
+    if (!status || !validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Statut invalide. Statuts autorisés: ${validStatuses.join(', ')}`
+      });
+    }
+
+    const order = await Order.findByPk(req.params.id, {
+      include: [
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'firstName', 'lastName', 'email']
+        }
+      ]
+    });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: 'Commande non trouvée'
+      });
+    }
+
+    const oldStatus = order.status;
+    await order.update({ status });
+
+    // Envoyer un email de notification à l'utilisateur
+    if (order.user && order.user.email) {
+      try {
+        await emailService.sendOrderStatusUpdate(order.user.email, order, oldStatus, status);
+      } catch (emailError) {
+        logger.error('Error sending status update email:', emailError);
+        // Ne pas faire échouer la requête si l'email échoue
+      }
+    }
+
+    logger.info(`Order status updated: ${order.id} from ${oldStatus} to ${status}`, { 
+      userId: req.user.id,
+      orderId: order.id,
+      oldStatus,
+      newStatus: status
+    });
+
+    res.json({
+      success: true,
+      message: `Statut de la commande mis à jour: ${status}`,
+      data: order
+    });
+
+  } catch (error) {
+    logger.error('Error updating order status:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erreur lors de la mise à jour du statut'
+    });
+  }
+});
+
 module.exports = router;

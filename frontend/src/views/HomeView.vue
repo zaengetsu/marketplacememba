@@ -76,6 +76,7 @@ import { useCartStore } from '@/stores/cart'
 import { productService } from '@/services/api'
 import { useToast } from 'vue-toastification'
 import type { Product } from '@/types/product'
+import { getCategoryImageUrl, getProductImageUrl } from '../utils/image'
 
 const cartStore = useCartStore()
 const toast = useToast()
@@ -84,22 +85,17 @@ const loading = ref(true)
 const error = ref<string | null>(null)
 
 // Mapping des images par catégorie
-const categoryImages: Record<string, string> = {
-  'chaussures': '/images/categories/chaussures.jpg',
-  'musculation': '/images/categories/musculation.jpg',
-  'yoga-pilates': '/images/categories/yoga.jpg',
-  'electronique-sport': '/images/categories/electronique.jpg',
-  'accessoires': '/images/categories/accessoires.jpg',
-  'nutrition': '/images/categories/nutrition.jpg',
-  'cardio': '/images/categories/cardio.jpg',
-  'sports-combat': '/images/categories/combat.jpg'
-}
-
 const getProductImage = (product: Product) => {
-  if (product.category?.slug) {
-    return categoryImages[product.category.slug] || '/placeholder.jpg'
+  // Utiliser d'abord l'image du produit si elle existe
+  if (product.images && product.images.length > 0) {
+    return getProductImageUrl(product)
   }
-  return '/placeholder.jpg'
+  // Sinon utiliser l'image de la catégorie
+  if (product.category?.slug) {
+    return getCategoryImageUrl(product.category.slug)
+  }
+  // Image par défaut
+  return '/placeholder.svg'
 }
 
 const addToCart = async (product: Product) => {

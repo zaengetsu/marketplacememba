@@ -180,6 +180,9 @@ router.get('/history', authenticate, async (req, res) => {
 router.post('/create-checkout-session', authenticate, async (req, res) => {
   try {
     const { orderId } = req.body;
+    
+    console.log('🔄 CREATE CHECKOUT SESSION - OrderID:', orderId);
+    
     const order = await Order.findByPk(orderId, {
       include: [{
         model: OrderItem,
@@ -190,9 +193,36 @@ router.post('/create-checkout-session', authenticate, async (req, res) => {
         }]
       }]
     });
-    if (!order) return res.status(404).json({ message: 'Commande introuvable' });
+    
+    if (!order) {
+      console.log('❌ ORDER NOT FOUND:', orderId);
+      return res.status(404).json({ 
+        success: false,
+        message: 'Commande introuvable' 
+      });
+    }
 
-    // Prépare les articles pour Stripe
+    console.log('✅ ORDER FOUND:', order.id, 'avec', order.orderItems.length, 'articles');
+
+    // En mode développement, on peut simuler le checkout
+    if (process.env.NODE_ENV === 'development') {
+      // Simulation d'une session de paiement
+      const simulatedSession = {
+        id: 'cs_simulation_' + Date.now(),
+        url: `http://localhost:5173/order-confirmation/${orderId}?session_id=cs_simulation_${Date.now()}&payment_status=success`,
+        payment_status: 'paid'
+      };
+      
+      console.log('💳 SIMULATION MODE - Session:', simulatedSession.id);
+      
+      return res.json({ 
+        success: true,
+        url: simulatedSession.url,
+        sessionId: simulatedSession.id
+      });
+    }
+
+    // Production: utiliser Stripe réel
     const line_items = order.orderItems.map(item => ({
       price_data: {
         currency: 'eur',
@@ -209,12 +239,26 @@ router.post('/create-checkout-session', authenticate, async (req, res) => {
       customer_email: req.user.email,
       success_url: `http://localhost:5173/order-confirmation/${orderId}?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: 'http://localhost:5173/orders',
-      metadata: { orderId: orderId }
+      metadata: { orderId: orderId.toString() }
     });
 
-    res.json({ url: session.url });
+    console.log('✅ STRIPE SESSION CREATED:', session.id);
+
+    res.json({ 
+      success: true,
+      url: session.url,
+      sessionId: session.id
+    });
+    
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('❌ CHECKOUT SESSION ERROR:', error.message);
+    logger.error('Checkout session error:', error);
+    
+    res.status(500).json({ 
+      success: false,
+      message: 'Erreur lors de la création de la session de paiement',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 

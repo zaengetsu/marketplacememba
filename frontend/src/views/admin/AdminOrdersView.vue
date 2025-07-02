@@ -39,6 +39,17 @@
           <td class="py-2 px-4 border-b">{{ order.total }} €</td>
           <td class="py-2 px-4 border-b">{{ formatDate(order.createdAt) }}</td>
           <td class="py-2 px-4 border-b">
+            <select 
+              :value="order.status" 
+              @change="updateOrderStatus(order, $event.target.value)"
+              class="form-select text-sm mr-2"
+            >
+              <option value="pending">En attente</option>
+              <option value="confirmed">Confirmée</option>
+              <option value="shipped">Expédiée</option>
+              <option value="delivered">Livrée</option>
+              <option value="cancelled">Annulée</option>
+            </select>
             <button class="btn btn-xs btn-outline">Voir</button>
           </td>
         </tr>
@@ -59,7 +70,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useToast } from 'vue-toastification'
 import apiClient from '@/services/api'
+
+const toast = useToast()
 
 const orders = ref<any[]>([])
 const pagination = ref({ page: 1, limit: 10, total: 0, pages: 1 })
@@ -99,6 +113,28 @@ const onSearch = () => {
 
 const formatDate = (date: string) => {
   return new Date(date).toLocaleString('fr-FR')
+}
+
+const updateOrderStatus = async (order: any, newStatus: string) => {
+  try {
+    const response = await apiClient.put(`/orders/${order.id}/status`, {
+      status: newStatus
+    })
+    
+    if (response.data.success) {
+      // Mise à jour locale
+      order.status = newStatus
+      toast.success('Statut de la commande mis à jour avec succès')
+    } else {
+      throw new Error(response.data.message || 'Erreur lors de la mise à jour')
+    }
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour du statut:', error)
+    toast.error('Erreur lors de la mise à jour du statut de la commande')
+    
+    // Recharger les données pour revenir à l'état original
+    await fetchOrders()
+  }
 }
 
 onMounted(fetchOrders)
