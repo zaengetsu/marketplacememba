@@ -21,13 +21,8 @@
               <!-- Recherche -->
               <div>
                 <label class="form-label">Rechercher</label>
-                <input 
-                  v-model="searchQuery"
-                  type="text" 
-                  placeholder="Nom du produit..."
-                  class="form-input"
-                  @input="debouncedSearch"
-                >
+                <input v-model="searchQuery" type="text" placeholder="Nom du produit..." class="form-input"
+                  @input="debouncedSearch">
               </div>
 
               <!-- Catégories -->
@@ -44,15 +39,8 @@
               <!-- Prix -->
               <div>
                 <label class="form-label">Prix maximum</label>
-                <input 
-                  v-model.number="maxPrice"
-                  type="range" 
-                  min="0" 
-                  max="2000" 
-                  step="50"
-                  class="w-full"
-                  @change="loadProducts"
-                >
+                <input v-model.number="maxPrice" type="range" min="0" max="2000" step="50" class="w-full"
+                  @change="loadProducts">
                 <div class="text-sm text-gray-600 mt-1">
                   Jusqu'à {{ maxPrice }}€
                 </div>
@@ -61,12 +49,7 @@
               <!-- Promotions -->
               <div>
                 <label class="flex items-center">
-                  <input 
-                    v-model="onlyOnSale"
-                    type="checkbox" 
-                    class="mr-2"
-                    @change="loadProducts"
-                  >
+                  <input v-model="onlyOnSale" type="checkbox" class="mr-2" @change="loadProducts">
                   <span class="text-sm">Promotions uniquement</span>
                 </label>
               </div>
@@ -74,12 +57,7 @@
               <!-- Stock -->
               <div>
                 <label class="flex items-center">
-                  <input 
-                    v-model="onlyInStock"
-                    type="checkbox" 
-                    class="mr-2"
-                    @change="loadProducts"
-                  >
+                  <input v-model="onlyInStock" type="checkbox" class="mr-2" @change="loadProducts">
                   <span class="text-sm">En stock uniquement</span>
                 </label>
               </div>
@@ -114,33 +92,30 @@
           </div>
 
           <!-- Grille des produits -->
-          <div v-else-if="products.length > 0" class="grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2 sm:gap-y-10 lg:grid-cols-3">
+          <div v-else-if="products.length > 0"
+            class="grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2 sm:gap-y-10 lg:grid-cols-3">
             <div v-for="product in products" :key="product.id" class="group relative">
               <div class="relative">
-                <img
-                  :src="getProductImage(product)"
-                  :alt="product.name"
-                  class="aspect-[4/3] w-full rounded-lg bg-gray-100 object-cover"
-                />
+                <img :src="getProductImageUrl(product)" :alt="product.name"
+                  class="aspect-[4/3] w-full rounded-lg bg-gray-100 object-cover" />
                 <!-- Badge promotion -->
-                <div v-if="product.isOnSale && product.salePrice" class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">
+                <div v-if="product.isOnSale && product.salePrice"
+                  class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">
                   -{{ Math.round(((product.price - product.salePrice) / product.price) * 100) }}%
                 </div>
                 <!-- Badge stock -->
-                <div v-if="product.stockQuantity <= 5 && product.stockQuantity > 0" class="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded text-xs">
+                <div v-if="product.stockQuantity <= 5 && product.stockQuantity > 0"
+                  class="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded text-xs">
                   Stock faible
                 </div>
-                <div v-else-if="product.stockQuantity === 0" class="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs">
+                <div v-else-if="product.stockQuantity === 0"
+                  class="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs">
                   Rupture
                 </div>
-                <div
-                  aria-hidden="true"
-                  class="absolute inset-0 flex items-end p-4 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <div 
-                    @click="openProductModal(product)"
-                    class="w-full rounded-md bg-white/75 px-4 py-2 text-center text-sm font-medium text-gray-900 backdrop-blur backdrop-filter cursor-pointer hover:bg-white/90"
-                  >
+                <div aria-hidden="true"
+                  class="absolute inset-0 flex items-end p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div @click="openProductModal(product)"
+                    class="w-full rounded-md bg-white/75 px-4 py-2 text-center text-sm font-medium text-gray-900 backdrop-blur backdrop-filter cursor-pointer hover:bg-white/90">
                     Voir le produit
                   </div>
                 </div>
@@ -156,19 +131,17 @@
                   <span v-if="product.isOnSale && product.salePrice" class="text-orange-600 font-bold">
                     {{ formatCurrency(product.salePrice) }}
                   </span>
-                  <span :class="product.isOnSale && product.salePrice ? 'line-through text-gray-400 text-sm' : 'text-orange-600 font-bold'">
+                  <span
+                    :class="product.isOnSale && product.salePrice ? 'line-through text-gray-400 text-sm' : 'text-orange-600 font-bold'">
                     {{ formatCurrency(product.price) }}
                   </span>
                 </div>
               </div>
               <p class="mt-1 text-sm text-gray-500">{{ product.category?.name || 'Sport' }}</p>
-              
+
               <!-- Bouton d'ajout au panier -->
-              <button 
-                @click.stop="addToCart(product)"
-                :disabled="!product.stockQuantity"
-                class="mt-3 w-full bg-orange-600 text-white py-2 px-4 rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
+              <button @click.stop="addToCart(product)" :disabled="!product.stockQuantity"
+                class="mt-3 w-full bg-orange-600 text-white py-2 px-4 rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                 {{ product.stockQuantity ? 'Ajouter au panier' : 'Rupture de stock' }}
               </button>
             </div>
@@ -181,7 +154,8 @@
             </div>
             <h3 class="text-xl font-semibold text-gray-900 mb-2">Aucun produit trouvé</h3>
             <p class="text-gray-600 mb-6">Essayez de modifier vos critères de recherche</p>
-            <button @click="resetFilters" class="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition-all">
+            <button @click="resetFilters"
+              class="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition-all">
               Réinitialiser les filtres
             </button>
           </div>
@@ -189,25 +163,17 @@
           <!-- Pagination -->
           <div v-if="totalPages > 1" class="flex justify-center mt-8">
             <div class="flex space-x-2">
-              <button 
-                @click="previousPage"
-                :disabled="currentPage === 1"
-                class="btn btn-outline"
-                :class="{ 'opacity-50 cursor-not-allowed': currentPage === 1 }"
-              >
+              <button @click="previousPage" :disabled="currentPage === 1" class="btn btn-outline"
+                :class="{ 'opacity-50 cursor-not-allowed': currentPage === 1 }">
                 Précédent
               </button>
-              
+
               <span class="flex items-center px-4 py-2 text-sm text-gray-600">
                 Page {{ currentPage }} sur {{ totalPages }}
               </span>
-              
-              <button 
-                @click="nextPage"
-                :disabled="currentPage === totalPages"
-                class="btn btn-outline"
-                :class="{ 'opacity-50 cursor-not-allowed': currentPage === totalPages }"
-              >
+
+              <button @click="nextPage" :disabled="currentPage === totalPages" class="btn btn-outline"
+                :class="{ 'opacity-50 cursor-not-allowed': currentPage === totalPages }">
                 Suivant
               </button>
             </div>
@@ -217,12 +183,8 @@
     </div>
 
     <!-- Modal détail produit -->
-    <ProductModal 
-      v-if="selectedProduct"
-      :product="selectedProduct"
-      @close="selectedProduct = null"
-      @add-to-cart="addToCart"
-    />
+    <ProductModal v-if="selectedProduct" :product="selectedProduct" @close="selectedProduct = null"
+      @add-to-cart="addToCart" />
   </div>
 </template>
 
@@ -234,6 +196,7 @@ import { productService, categoryService } from '../services/api'
 import type { Product, Category } from '../types/product'
 import ProductModal from '../components/ProductModal.vue'
 import { useToast } from 'vue-toastification'
+import { getProductImageUrl } from '../utils/image'
 
 const route = useRoute()
 const cartStore = useCartStore()
@@ -258,18 +221,6 @@ const currentPage = ref(1)
 const itemsPerPage = 12
 const totalProducts = ref(0)
 const totalPages = ref(0)
-
-// Images par défaut pour les catégories
-const categoryImages: Record<string, string> = {
-  'chaussures': 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&h=500&fit=crop',
-  'musculation': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=500&fit=crop',
-  'yoga-pilates': 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=500&h=500&fit=crop',
-  'electronique-sport': 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&h=500&fit=crop',
-  'accessoires': 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&h=500&fit=crop',
-  'nutrition': 'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=500&h=500&fit=crop',
-  'cardio': 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=500&fit=crop',
-  'sports-combat': 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=500&h=500&fit=crop'
-}
 
 // Debounce pour la recherche
 let searchTimeout: NodeJS.Timeout
@@ -310,7 +261,7 @@ const loadProducts = async () => {
     if (onlyInStock.value) params.inStock = true
 
     const response = await productService.getProducts(params)
-    
+
     if (response.success && response.data) {
       products.value = response.data.products || []
       if (response.data.pagination) {
@@ -327,12 +278,6 @@ const loadProducts = async () => {
   }
 }
 
-const getProductImage = (product: Product) => {
-  // Utiliser l'image par défaut basée sur la catégorie
-  const categorySlug = product.category?.slug || 'accessoires'
-  return categoryImages[categorySlug] || categoryImages['accessoires']
-}
-
 const addToCart = async (product: Product) => {
   // Convertir le produit au format attendu par le store (ancien format avec _id)
   const cartProduct: any = {
@@ -342,16 +287,16 @@ const addToCart = async (product: Product) => {
     price: product.isOnSale && product.salePrice ? product.salePrice : product.price,
     salePrice: product.salePrice,
     isOnSale: product.isOnSale,
-    images: [{ url: getProductImage(product), alt: product.name, isPrimary: true }],
-    category: { 
-      id: product.categoryId.toString(), 
-      name: product.category?.name || 'Sport', 
-      slug: product.category?.slug || 'sport' 
+    images: [{ url: getProductImageUrl(product), alt: product.name, isPrimary: true }],
+    category: {
+      id: product.categoryId.toString(),
+      name: product.category?.name || 'Sport',
+      slug: product.category?.slug || 'sport'
     },
-    stock: { 
-      quantity: product.stockQuantity, 
-      reserved: 0, 
-      lowStockThreshold: 5 
+    stock: {
+      quantity: product.stockQuantity,
+      reserved: 0,
+      lowStockThreshold: 5
     },
     slug: product.slug || product.name.toLowerCase().replace(/\s+/g, '-'),
     status: 'active' as const,
@@ -361,7 +306,7 @@ const addToCart = async (product: Product) => {
     createdAt: product.createdAt,
     updatedAt: product.updatedAt
   }
-  
+
   await cartStore.addItem(cartProduct, 1)
 }
 
@@ -415,4 +360,4 @@ onMounted(async () => {
   await loadCategories()
   await loadProducts()
 })
-</script> 
+</script>

@@ -8,7 +8,10 @@ export interface Product {
   stockQuantity: number
   categoryId: number
   category?: Category
+  images: string[]  // ← Images simples (URLs)
   slug?: string
+  status?: string
+  isActive?: boolean
   createdAt: string
   updatedAt: string
 }
@@ -24,14 +27,25 @@ export interface Category {
 }
 
 // Types pour l'affichage frontend (avec images et données supplémentaires)
-export interface ProductDisplay extends Product {
-  images: { url: string; alt: string; isPrimary: boolean }[]
+export interface ProductDisplay {
+  id: number
+  name: string
+  description: string
+  price: number
+  salePrice?: number
+  isOnSale: boolean
+  stockQuantity: number
+  categoryId: number
+  images: { url: string; alt: string; isPrimary: boolean }[]  // ← Images complexes
   stock: { quantity: number; reserved: number; lowStockThreshold: number }
   rating?: { average: number; count: number }
   salesCount?: number
+  slug?: string
   status?: string
   isActive?: boolean
-  _id?: string // Ajoute cette ligne pour la clé du template
+  _id?: string // Pour la clé du template
+  createdAt: string
+  updatedAt: string
   category: {
     id: number
     name: string

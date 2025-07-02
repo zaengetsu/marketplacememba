@@ -24,7 +24,16 @@ module.exports = (sequelize, DataTypes) => {
     salePrice: DataTypes.DECIMAL,
     isOnSale: DataTypes.BOOLEAN,
     stockQuantity: DataTypes.INTEGER,
-    categoryId: DataTypes.INTEGER
+    categoryId: DataTypes.INTEGER,
+    images: {
+      type: DataTypes.JSONB,
+      allowNull: true,
+      defaultValue: []
+    },
+    // ↑ AJOUTEZ CETTE LIGNE ↑
+    slug: DataTypes.STRING,
+    status: DataTypes.ENUM('draft', 'active', 'inactive'),
+    isActive: DataTypes.BOOLEAN
   }, {
     sequelize,
     modelName: 'Product',

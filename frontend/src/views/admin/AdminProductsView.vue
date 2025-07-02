@@ -81,7 +81,7 @@
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
                     <div class="flex-shrink-0 h-12 w-12">
-                      <img :src="product.images[0]?.url || '/placeholder.jpg'" :alt="product.name"
+                      <img :src="getProductImageUrl(product)" :alt="product.name"
                         class="h-12 w-12 rounded-lg object-cover">
                     </div>
                     <div class="ml-4">
@@ -193,6 +193,7 @@ import type { ProductDisplay } from '../../types/product'
 import ProductModal from '../../components/ProductModal.vue'
 import { productService } from '@/services/api'
 import { categoryService } from '@/services/api'
+import { getProductImageUrl } from '../../utils/image'
 
 const toast = useToast()
 
@@ -225,23 +226,23 @@ function mapProductFromApi(apiProduct: any): ProductDisplay {
     },
     category: apiProduct.category
       ? {
-          id: apiProduct.category.id?.toString() ?? '',
-          name: apiProduct.category.name ?? '',
-          slug: apiProduct.category.slug ?? '',
-          description: apiProduct.category.description ?? '',
-          isActive: apiProduct.category.isActive ?? true,
-          createdAt: apiProduct.category.createdAt ?? '',
-          updatedAt: apiProduct.category.updatedAt ?? ''
-        }
+        id: apiProduct.category.id?.toString() ?? '',
+        name: apiProduct.category.name ?? '',
+        slug: apiProduct.category.slug ?? '',
+        description: apiProduct.category.description ?? '',
+        isActive: apiProduct.category.isActive ?? true,
+        createdAt: apiProduct.category.createdAt ?? '',
+        updatedAt: apiProduct.category.updatedAt ?? ''
+      }
       : {
-          id: apiProduct.categoryId?.toString() ?? '',
-          name: '',
-          slug: '',
-          description: '',
-          isActive: true,
-          createdAt: '',
-          updatedAt: ''
-        },
+        id: apiProduct.categoryId?.toString() ?? '',
+        name: '',
+        slug: '',
+        description: '',
+        isActive: true,
+        createdAt: '',
+        updatedAt: ''
+      },
     status: apiProduct.status ?? 'active',
     isActive: apiProduct.isActive ?? true,
     rating: apiProduct.rating ?? { average: 0, count: 0 },
@@ -290,7 +291,8 @@ const filteredProducts = computed(() => {
   }
 
   if (selectedCategory.value) {
-filtered = filtered.filter(product => String(product.category.id) === String(selectedCategory.value))  }
+    filtered = filtered.filter(product => String(product.category.id) === String(selectedCategory.value))
+  }
 
   if (selectedStatus.value) {
     filtered = filtered.filter(product => product.status === selectedStatus.value)

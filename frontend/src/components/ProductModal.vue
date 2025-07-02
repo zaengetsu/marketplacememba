@@ -17,7 +17,7 @@
         <div>
           <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden mb-4">
             <img 
-              :src="selectedImage?.url || '/placeholder.jpg'" 
+              :src="getImageUrl(selectedImage)" 
               :alt="product.name"
               class="w-full h-96 object-cover"
             >
@@ -25,7 +25,7 @@
             <div v-if="product.isOnSale" class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
               PROMOTION
             </div>
-            <div v-if="product.stock.quantity <= 5" class="absolute top-4 right-4 bg-orange-500 text-white px-3 py-1 rounded-full text-sm">
+            <div v-if="product.stockQuantity <= 5" class="absolute top-4 right-4 bg-orange-500 text-white px-3 py-1 rounded-full text-sm">
               Stock faible
             </div>
           </div>
@@ -39,7 +39,7 @@
               class="w-16 h-16 bg-gray-200 rounded overflow-hidden border-2"
               :class="selectedImage === image ? 'border-blue-500' : 'border-transparent'"
             >
-              <img :src="image.url" :alt="image.alt" class="w-full h-full object-cover">
+              <img :src="getImageUrl(image)" :alt="`Image ${index + 1}`" class="w-full h-full object-cover">
             </button>
           </div>
         </div>
@@ -77,8 +77,8 @@
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-600">Stock disponible :</span>
-                <span class="font-medium" :class="product.stock.quantity > 0 ? 'text-green-600' : 'text-red-600'">
-                  {{ product.stock.quantity }} unité(s)
+                <span class="font-medium" :class="product.stockQuantity > 0 ? 'text-green-600' : 'text-red-600'">
+                  {{ product.stockQuantity }} unité(s)
                 </span>
               </div>
               <div class="flex justify-between">
@@ -111,12 +111,12 @@
                   v-model.number="quantity" 
                   type="number" 
                   min="1" 
-                  :max="product.stock.quantity"
+                  :max="product.stockQuantity"
                   class="w-16 text-center border-0 focus:ring-0"
                 >
                 <button 
-                  @click="quantity < product.stock.quantity && quantity++"
-                  :disabled="quantity >= product.stock.quantity"
+                  @click="quantity < product.stockQuantity && quantity++"
+                  :disabled="quantity >= product.stockQuantity"
                   class="px-3 py-1 hover:bg-gray-100 disabled:opacity-50"
                 >
                   +
@@ -126,16 +126,16 @@
 
             <button 
               @click="handleAddToCart"
-              :disabled="!product.stock.quantity || isAdding"
+              :disabled="!product.stockQuantity || isAdding"
               class="w-full btn btn-primary py-3 text-lg"
-              :class="{ 'opacity-50 cursor-not-allowed': !product.stock.quantity || isAdding }"
+              :class="{ 'opacity-50 cursor-not-allowed': !product.stockQuantity || isAdding }"
             >
               <span v-if="isAdding" class="flex items-center justify-center">
                 <div class="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 Ajout en cours...
               </span>
               <span v-else>
-                {{ product.stock.quantity ? `Ajouter au panier (${quantity})` : 'Rupture de stock' }}
+                {{ product.stockQuantity ? `Ajouter au panier (${quantity})` : 'Rupture de stock' }}
               </span>
             </button>
           </div>
@@ -158,6 +158,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import type { Product } from '../types/product'
+import { getImageUrl } from '../utils/image'
 
 interface Props {
   product: Product

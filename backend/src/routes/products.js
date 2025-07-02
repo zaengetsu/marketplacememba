@@ -29,7 +29,7 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ 
+const upload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
   fileFilter: (req, file, cb) => {
@@ -179,6 +179,9 @@ router.get('/:id', async (req, res) => {
 // POST /api/products - Créer un produit (Admin/Store Keeper)
 router.post('/', authenticate, requirePermission('products:write'), upload.array('images', 5), async (req, res) => {
   try {
+    console.log('📤 FILES REÇUS:', req.files); // ← AJOUTER
+    console.log('📤 BODY REÇU:', req.body);    // ← AJOUTER
+
     const {
       name,
       description,
@@ -210,6 +213,8 @@ router.post('/', authenticate, requirePermission('products:write'), upload.array
 
     // Traiter les images uploadées
     const images = req.files ? req.files.map(file => `/uploads/products/${file.filename}`) : [];
+    console.log('📸 IMAGES TRAITÉES:', images); // ← AJOUTER
+    console.log('📸 NOMBRE D\'IMAGES:', req.files ? req.files.length : 0); // ← AJOUTER
 
     // Générer le slug
     const slug = name
@@ -227,11 +232,14 @@ router.post('/', authenticate, requirePermission('products:write'), upload.array
       salePrice: salePrice ? parseFloat(salePrice) : null,
       isOnSale,
       stockQuantity: parseInt(stockQuantity),
-      images,
+      images, // ← Les images sont bien incluses
       slug,
       status,
       isActive
     });
+
+    console.log('🗄️ PRODUIT CRÉÉ AVEC IMAGES:', product.images); // ← AJOUTER
+
 
     // Charger le produit avec ses relations
     const createdProduct = await Product.findByPk(product.id, {
@@ -275,8 +283,9 @@ router.post('/', authenticate, requirePermission('products:write'), upload.array
     });
   }
 });
+
 // PUT /api/products/:id - Modifier un produit (Admin/Store Keeper)
-router.put('/:id', authenticate, requirePermission('products:write'), async (req, res) => {
+router.put('/:id', authenticate, requirePermission('products:write'), upload.array('images', 5), async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id);
 
@@ -322,6 +331,26 @@ router.put('/:id', authenticate, requirePermission('products:write'), async (req
         .replace(/^-+|-+$/g, '');
     }
 
+    // Gérer les nouvelles images uploadées
+    let finalImages = product.images || [];
+    
+    // Si de nouvelles images ont été uploadées
+    if (req.files && req.files.length > 0) {
+      const newImageUrls = req.files.map(file => `/uploads/products/${file.filename}`);
+      
+      // Si images est fourni dans le body, on considère que c'est pour conserver certaines anciennes images
+      if (images && Array.isArray(images)) {
+        // Combiner les anciennes images conservées avec les nouvelles
+        finalImages = [...images, ...newImageUrls];
+      } else {
+        // Remplacer toutes les images par les nouvelles
+        finalImages = newImageUrls;
+      }
+    } else if (images && Array.isArray(images)) {
+      // Si pas de nouvelles images mais images est fourni, utiliser celui-ci
+      finalImages = images;
+    }
+
     await product.update({
       name: name || product.name,
       description: description || product.description,
@@ -330,7 +359,7 @@ router.put('/:id', authenticate, requirePermission('products:write'), async (req
       salePrice: salePrice ? parseFloat(salePrice) : product.salePrice,
       isOnSale: isOnSale !== undefined ? isOnSale : product.isOnSale,
       stockQuantity: stockQuantity !== undefined ? parseInt(stockQuantity) : product.stockQuantity,
-      images: images || product.images,
+      images: finalImages,
       slug,
       status: status || product.status,
       isActive: isActive !== undefined ? isActive : product.isActive

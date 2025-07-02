@@ -104,11 +104,13 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https:"],
+      imgSrc: ["'self'", "data:", "https:", "http://localhost:5173"],
       scriptSrc: ["'self'"],
       connectSrc: ["'self'", "https://api.stripe.com"]
     }
-  }
+  },
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginOpenerPolicy: { policy: "unsafe-none" }
 }));
 
 // Configuration CORS
@@ -118,6 +120,14 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
+
+// Servir les fichiers statiques avec CORS explicite
+app.use('/uploads', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+  res.header('Access-Control-Allow-Methods', 'GET');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+}, express.static('uploads'));
 
 // Rate limiting (plus permissif en développement)
 const limiter = rateLimit({
@@ -167,6 +177,9 @@ if (redisStore) {
   logger.warn('Using memory store for sessions (not recommended for production)');
 }
 
+// Configuration des sessions
+app.use(session(sessionConfig));
+
 app.post(
   '/api/payments/webhook',
   express.raw({ type: 'application/json' }),
@@ -176,10 +189,6 @@ app.post(
 // Parse du JSON et des données de formulaire
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Servir les fichiers statiques
-app.use('/uploads', express.static('uploads'));
-
 // Routes API
 console.log('🔄 Configuration des routes API...');
 app.use('/api/auth', authRoutes);
