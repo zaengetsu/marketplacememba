@@ -114,7 +114,7 @@ VITE_STRIPE_PUBLIC_KEY=pk_test_votre_cle_publique
 
 ## 👥 Comptes de démonstration
 
-| Email | Mot de passe | Rôle |
+| Email | Mot de passe | Rôle  |
 |-------|-------------|------|
 | admin@ecommerce.com | password123 | ROLE_ADMIN |
 | john.doe@example.com | password123 | ROLE_USER |
