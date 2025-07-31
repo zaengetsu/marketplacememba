@@ -1,0 +1,111 @@
+version: '3.8'
+
+services:
+  # Base de données PostgreSQL (données principales)
+  postgres:
+    image: postgres:15
+    container_name: ecommerce-postgres-prod
+    restart: always
+    environment:
+      POSTGRES_DB: ecommerce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+
+  # Base de données MongoDB (recherche et cache)
+  mongodb:
+    image: mongo:7.0
+    container_name: ecommerce-mongodb-prod
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: ecommerce
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - ecommerce-network
+
+  # Base de données Redis pour les sessions et cache
+  redis:
+    image: redis:7.2-alpine
+    container_name: ecommerce-redis-prod
+    restart: always
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ecommerce-network
+
+  # API Backend NodeJS
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: ecommerce-backend-prod
+    restart: always
+    ports:
+      - "8001:4000"  # Port externe 8001 pour VPS, interne 4000
+    env_file:
+      - ./backend/.env.production
+    depends_on:
+      - postgres
+      - mongodb
+      - redis
+    networks:
+      - ecommerce-network
+    environment:
+      - NODE_ENV=production
+      - PORT=${BACKEND_PORT:-4000}
+
+  # Frontend VueJS
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: ecommerce-frontend-prod
+    restart: always
+    ports:
+      - "8002:80"  # Port externe 8002 pour VPS, interne 80
+    environment:
+      VITE_API_URL: http://162.19.78.55:8001/api
+      VITE_STRIPE_PUBLIC_KEY: ${VITE_STRIPE_PUBLIC_KEY}
+      VITE_BASE_URL: http://162.19.78.55:8002
+    depends_on:
+      - backend
+    networks:
+      - ecommerce-network
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: ecommerce-nginx-prod
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - ecommerce-network
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  redis_data:
+
+networks:
+  ecommerce-network:
+    driver: bridge

@@ -1,0 +1,44 @@
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Copier les fichiers de dépendances
+COPY package*.json ./
+
+# Installer les dépendances de production uniquement
+RUN npm ci --only=production && npm cache clean --force
+
+# Copier le code source
+COPY . .
+
+# Étape finale - image légère pour la production
+FROM node:18-alpine
+
+# Créer un utilisateur non-root pour la sécurité
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S backend -u 1001
+
+# Installer dumb-init pour une gestion propre des signaux
+RUN apk add --no-cache dumb-init
+
+WORKDIR /app
+
+# Copier les dépendances et le code depuis l'étape de build
+COPY --from=builder --chown=backend:nodejs /app/node_modules ./node_modules
+COPY --chown=backend:nodejs . .
+
+# Créer les dossiers nécessaires
+RUN mkdir -p logs invoices uploads && \
+    chown -R backend:nodejs logs invoices uploads
+
+# Basculer vers l'utilisateur non-root
+USER backend
+
+# Exposer le port
+EXPOSE 4000
+
+# Utiliser dumb-init pour une gestion propre des processus
+ENTRYPOINT ["dumb-init", "--"]
+
+# Démarrer l'application en mode production
+CMD ["node", "src/index.js"]
