@@ -36,8 +36,11 @@
           <h3 class="text-lg font-semibold mb-4">Légal</h3>
           <ul class="space-y-2 text-sm">
             <li><a href="#" class="text-gray-400 hover:text-white transition-colors">CGV</a></li>
-            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Politique de confidentialité</a></li>
-            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">RGPD</a></li>
+            <li>
+              <router-link to="/privacy-policy" class="text-gray-400 hover:text-white transition-colors">
+                Politique de confidentialité &amp; RGPD
+              </router-link>
+            </li>
           </ul>
         </div>
       </div>
