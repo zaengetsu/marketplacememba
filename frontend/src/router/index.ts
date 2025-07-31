@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHistory, RouteLocationNormalized, NavigationGuardNext } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 
 const router = createRouter({
@@ -13,6 +13,21 @@ const router = createRouter({
       path: "/privacy-policy",
       name: "privacy-policy",
       component: () => import("../views/PrivacyPolicyView.vue"),
+    },
+    {
+      path: "/contact",
+      name: "contact",
+      component: () => import("../views/ContactView.vue"),
+    },
+    {
+      path: "/faq",
+      name: "faq",
+      component: () => import("../views/FAQView.vue"),
+    },
+    {
+      path: "/shipping",
+      name: "shipping",
+      component: () => import("../views/ShippingView.vue"),
     },
     {
       path: "/products",
@@ -171,7 +186,7 @@ const router = createRouter({
 });
 
 // Garde de navigation pour l'authentification
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
   const authStore = useAuthStore();
 
   // Vérifier l'authentification si pas encore fait

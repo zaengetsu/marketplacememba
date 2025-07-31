@@ -30,7 +30,7 @@ connectDB();
 // Import des routes APRÈS la connexion DB
 console.log('🔄 Import des routes...');
 let authRoutes, userRoutes, productRoutes, categoryRoutes, cartRoutes, orderRoutes;
-let paymentRoutes, invoiceRoutes, stockRoutes, alertRoutes, adminRoutes, rgpdRoutes, webhookRoutes;
+let paymentRoutes, invoiceRoutes, stockRoutes, alertRoutes, adminRoutes, rgpdRoutes, webhookRoutes, contactRoutes;
 
 try {
   console.log('  - auth routes...');
@@ -59,6 +59,8 @@ try {
   rgpdRoutes = require('./routes/rgpd');
   console.log('  - webhook routes...');
   webhookRoutes = require('./routes/webhooks');
+  console.log('  - contact routes...');
+  contactRoutes = require('./routes/contact');
   console.log('✅ Toutes les routes importées avec succès');
 } catch (error) {
   console.error('❌ Erreur lors de l\'import des routes:', error.message);
@@ -203,6 +205,7 @@ app.use('/api/stock', stockRoutes);
 app.use('/api/alerts', alertRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/rgpd', rgpdRoutes);
+app.use('/api/contact', contactRoutes);
 console.log('✅ Routes API configurées');
 
 // Route de santé

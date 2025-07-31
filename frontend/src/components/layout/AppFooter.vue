@@ -25,9 +25,15 @@
         <div>
           <h3 class="text-lg font-semibold mb-4">Support</h3>
           <ul class="space-y-2 text-sm">
-            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Contact</a></li>
-            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
-            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Livraison</a></li>
+            <li>
+              <router-link to="/contact" class="text-gray-400 hover:text-white transition-colors">Contact</router-link>
+            </li>
+            <li>
+              <router-link to="/faq" class="text-gray-400 hover:text-white transition-colors">FAQ</router-link>
+            </li>
+            <li>
+              <router-link to="/shipping" class="text-gray-400 hover:text-white transition-colors">Livraison</router-link>
+            </li>
           </ul>
         </div>
 
