@@ -27,6 +27,14 @@ module.exports = (sequelize, DataTypes) => {
     lastName: DataTypes.STRING,
     email: DataTypes.STRING,
     password: DataTypes.STRING,
+    phone: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    birthDate: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
     role: {
       type: DataTypes.ENUM,
       values: ['ROLE_USER', 'ROLE_STORE_KEEPER', 'ROLE_COMPTA', 'ROLE_ADMIN'],

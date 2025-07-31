@@ -94,65 +94,21 @@
                 </div>
 
                 <div class="flex justify-end">
-                  <button type="button" @click="exportMyData" class="px-6 py-3 bg-orange-100 text-orange-700 rounded-lg border border-orange-200 hover:bg-orange-200 transition-all mr-2">
+                  <button type="button" @click="exportMyData"
+                    class="flex items-center px-5 py-3 bg-gradient-to-r from-orange-100 to-orange-200 text-orange-700 font-semibold rounded-lg border border-orange-300 hover:from-orange-200 hover:to-orange-300 hover:text-orange-800 shadow-sm transition-all mr-3">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4m-8 8h8"/></svg>
                     Exporter mes données
                   </button>
-                  <button type="button" @click="deleteMyAccount" class="px-6 py-3 bg-red-100 text-red-700 rounded-lg border border-red-200 hover:bg-red-200 transition-all mr-2">
+                  <button type="button" @click="deleteMyAccount"
+                    class="flex items-center px-5 py-3 bg-gradient-to-r from-red-100 to-red-200 text-red-700 font-semibold rounded-lg border border-red-300 hover:from-red-200 hover:to-red-300 hover:text-red-800 shadow-sm transition-all mr-3">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
                     Supprimer mon compte
                   </button>
                   <button type="submit" :disabled="personalForm.isLoading.value"
-                    class="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition-all disabled:opacity-50">
+                    class="flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-red-700 shadow-sm transition-all disabled:opacity-50">
+                    <svg v-if="personalForm.isLoading" class="w-5 h-5 mr-2 animate-spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
                     {{ personalForm.isLoading ? 'Enregistrement...' : 'Enregistrer' }}
                   </button>
-// RGPD : Exporter mes données
-const exportMyData = async () => {
-  try {
-    const res = await fetch('/api/users/me/export', {
-      headers: { 'Authorization': `Bearer ${authStore.token}` }
-    })
-    const result = await res.json()
-    if (result.success) {
-      // Téléchargement JSON
-      const blob = new Blob([JSON.stringify(result.data, null, 2)], { type: 'application/json' })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'mes-donnees-mambafit.json'
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-      toast.success('Export des données réussi !')
-    } else {
-      toast.error(result.message || 'Erreur lors de l’export')
-    }
-  } catch (e) {
-    toast.error('Erreur lors de l’export')
-  }
-}
-
-// RGPD : Supprimer mon compte
-const deleteMyAccount = async () => {
-  if (!confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) return
-  try {
-    const res = await fetch('/api/users/me', {
-      method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${authStore.token}` }
-    })
-    const result = await res.json()
-    if (result.success) {
-      toast.success('Compte supprimé. Déconnexion...')
-      setTimeout(() => {
-        authStore.logout()
-        window.location.href = '/'
-      }, 1500)
-    } else {
-      toast.error(result.message || 'Erreur lors de la suppression')
-    }
-  } catch (e) {
-    toast.error('Erreur lors de la suppression')
-  }
-}
                 </div>
               </form>
             </div>
@@ -349,11 +305,54 @@ const personalForm = useForm({
     birthDate: ''
   },
   validationSchema: personalInfoSchema,
-  onSubmit: async () => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    toast.success('Informations personnelles mises à jour')
+  onSubmit: async (data) => {
+    try {
+      const res = await fetch('/api/users/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authStore.token}`
+        },
+        body: JSON.stringify(data)
+      })
+      const result = await res.json()
+      if (result.success) {
+        toast.success('Informations personnelles mises à jour')
+        // Mettre à jour le store utilisateur sans écraser l'id et en gardant les champs obligatoires
+        if (authStore.user) {
+          authStore.user = {
+            ...authStore.user,
+            ...data,
+            id: authStore.user.id,
+            role: authStore.user.role ?? 'ROLE_USER',
+            isActive: authStore.user.isActive ?? true,
+            isEmailVerified: authStore.user.isEmailVerified ?? false
+          }
+        }
+      } else {
+        toast.error(result.message || 'Erreur lors de la mise à jour')
+      }
+    } catch (e) {
+      toast.error('Erreur lors de la mise à jour')
+    }
   }
+})
+
+// Charger les infos utilisateur à l'ouverture de la page
+onMounted(async () => {
+  try {
+    const res = await fetch('/api/users/profile', {
+      headers: { 'Authorization': `Bearer ${authStore.token}` }
+    })
+    const result = await res.json()
+    if (result.success && result.data) {
+      personalForm.data.firstName = result.data.firstName || ''
+      personalForm.data.lastName = result.data.lastName || ''
+      personalForm.data.email = result.data.email || ''
+      personalForm.data.phone = result.data.phone || ''
+      personalForm.data.birthDate = result.data.birthDate ? result.data.birthDate.slice(0, 10) : ''
+    }
+  } catch (e) {}
 })
 
 // Password Form
@@ -449,7 +448,55 @@ const savePreferences = async () => {
     isLoadingPreferences.value = false
   }
 }
+// RGPD : Exporter mes données
+const exportMyData = async () => {
+  try {
+    const res = await fetch('/api/users/me/export', {
+      headers: { 'Authorization': `Bearer ${authStore.token}` }
+    })
+    const result = await res.json()
+    if (result.success) {
+      // Téléchargement JSON
+      const blob = new Blob([JSON.stringify(result.data, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'mes-donnees-mambafit.json'
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      toast.success('Export des données réussi !')
+    } else {
+      toast.error(result.message || 'Erreur lors de l’export')
+    }
+  } catch (e) {
+    toast.error('Erreur lors de l’export')
+  }
+}
 
+// RGPD : Supprimer mon compte
+const deleteMyAccount = async () => {
+  if (!confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')) return
+  try {
+    const res = await fetch('/api/users/me', {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${authStore.token}` }
+    })
+    const result = await res.json()
+    if (result.success) {
+      toast.success('Compte supprimé. Déconnexion...')
+      setTimeout(() => {
+        authStore.logout()
+        window.location.href = '/'
+      }, 1500)
+    } else {
+      toast.error(result.message || 'Erreur lors de la suppression')
+    }
+  } catch (e) {
+    toast.error('Erreur lors de la suppression')
+  }
+}
 const formatDate = (date: Date) => {
   return new Intl.DateTimeFormat('fr-FR', {
     year: 'numeric',
