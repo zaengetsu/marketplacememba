@@ -48,12 +48,15 @@
         <div>
           <!-- Prix -->
           <div class="mb-6">
-            <div class="flex items-center space-x-3 mb-2">
-              <span v-if="product.isOnSale" class="text-3xl font-bold text-red-500">
-                {{ product.salePrice }}€
+            <div class="flex flex-col items-start space-y-1 mb-2">
+              <span class="text-3xl font-bold" :class="product.isOnSale ? 'text-red-500' : 'text-gray-900'">
+                {{ (product.isOnSale && product.salePrice ? product.salePrice : product.price).toFixed(2) }}€ TTC
               </span>
-              <span :class="product.isOnSale ? 'line-through text-gray-400 text-xl' : 'text-3xl font-bold text-gray-900'">
-                {{ product.price }}€
+              <span class="text-xs text-gray-500">
+                HT : {{ ((product.isOnSale && product.salePrice ? product.salePrice : product.price) / 1.2).toFixed(2) }}€
+              </span>
+              <span v-if="product.isOnSale" class="line-through text-gray-400 text-xl">
+                {{ product.price.toFixed(2) }}€ TTC
               </span>
             </div>
             <div v-if="product.isOnSale" class="text-sm text-green-600 font-medium">
@@ -73,7 +76,7 @@
             <div class="space-y-2 text-sm">
               <div class="flex justify-between">
                 <span class="text-gray-600">Catégorie :</span>
-                <span class="font-medium">{{ product.category.name }}</span>
+                <span class="font-medium">{{ product.category?.name || 'Catégorie inconnue' }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-600">Stock disponible :</span>
@@ -86,10 +89,10 @@
                 <div class="flex items-center">
                   <div class="flex text-yellow-400 mr-1">
                     <span v-for="i in 5" :key="i" class="text-sm">
-                      {{ i <= Math.floor(product.rating.average) ? '★' : '☆' }}
+                      {{ i <= Math.floor(product.rating?.average ?? 0) ? '★' : '☆' }}
                     </span>
                   </div>
-                  <span class="text-sm text-gray-600">({{ product.rating.count }} avis)</span>
+                  <span class="text-sm text-gray-600">({{ product.rating?.count ?? 0 }} avis)</span>
                 </div>
               </div>
             </div>

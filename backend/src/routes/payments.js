@@ -72,43 +72,88 @@ router.post('/confirm', authenticate, async (req, res) => {
       });
     }
 
+
     // Appel réel à Stripe pour récupérer le PaymentIntent
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
     if (paymentIntent.status === 'succeeded') {
       if (orderId) {
-        const { Order, Invoice, User } = require('../../models');
+        const { Order, OrderItem, Product, Invoice, User } = require('../../models');
         const emailService = require('../services/emailService');
-        const order = await Order.findByPk(orderId);
+        const { generateInvoicePdf } = require('../services/invoicePdfService');
+        const order = await Order.findByPk(orderId, {
+          include: [{ model: OrderItem, as: 'orderItems', include: [{ model: Product, as: 'Product' }] }]
+        });
 
         if (order) {
           await order.update({ status: 'confirmed' });
+
+          // Calcul HT/TVA/TTC (taux 20% par défaut)
+          const tvaRate = 0.2;
+          let totalHT = 0, totalTVA = 0, totalTTC = 0;
+          const items = order.orderItems.map(item => {
+            const priceHT = parseFloat(item.Product.price) / (1 + tvaRate);
+            const tva = parseFloat(item.Product.price) - priceHT;
+            const priceTTC = parseFloat(item.Product.price);
+            totalHT += priceHT * item.quantity;
+            totalTVA += tva * item.quantity;
+            totalTTC += priceTTC * item.quantity;
+            return {
+              name: item.Product.name,
+              quantity: item.quantity,
+              priceHT,
+              tva,
+              priceTTC
+            };
+          });
 
           // Création de la facture
           const invoiceNumber = `INV-${Date.now()}-${orderId}`;
           const invoice = await Invoice.create({
             orderId: order.id,
+            userId: order.userId,
             invoiceNumber,
-            amount: order.total,
+            amount: totalTTC,
+            totalHT: totalHT,
+            tva: totalTVA,
+            totalTTC: totalTTC,
             status: 'sent',
             issuedAt: new Date(),
             dueAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
             paidAt: new Date()
           });
 
-          // Récupère l'utilisateur
+          // Génère le PDF de la facture
           const user = await User.findByPk(order.userId);
-          if (user) {
-            // Génère le PDF de la facture
-            const invoicePath = await generateInvoicePDF(order, invoice, user);
-            // Envoie l'email de confirmation avec la facture en pièce jointe
-            await emailService.sendOrderConfirmation(user.email, order, user, invoicePath);
+          const orderForPdf = {
+            ...order.toJSON(),
+            items
+          };
+          const pdfPath = await generateInvoicePdf(invoice, orderForPdf);
+          await invoice.update({ pdfPath });
+
+          // Envoie l'email de confirmation avec la facture en pièce jointe
+          if (user && emailService.isEnabled) {
+            await emailService.transporter.sendMail({
+              from: process.env.MAIL_FROM,
+              to: user.email,
+              subject: `Votre facture pour la commande #${order.id}`,
+              text: `Bonjour ${user.firstName},\n\nMerci pour votre commande. Vous trouverez votre facture en pièce jointe.`,
+              attachments: [
+                {
+                  filename: `facture-${invoice.id}.pdf`,
+                  path: pdfPath
+                }
+              ]
+            });
           }
 
           logger.info('Invoice auto-created after payment', {
             orderId: order.id,
             invoiceNumber,
-            amount: order.total
+            totalHT,
+            totalTVA,
+            totalTTC
           });
         }
       }

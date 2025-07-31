@@ -215,10 +215,21 @@ const itemsPerPage = 10
 
 // Mapping pour adapter la structure backend -> front
 function mapProductFromApi(apiProduct: any): ProductDisplay {
+  // On force images à être un tableau de string (URL) pour compatibilité ProductModal
+  let images: string[] = [];
+  if (Array.isArray(apiProduct.images)) {
+    if (typeof apiProduct.images[0] === 'string') {
+      images = apiProduct.images;
+    } else if (typeof apiProduct.images[0] === 'object' && apiProduct.images[0]?.url) {
+      images = apiProduct.images.map((img: any) => img.url);
+    }
+  }
   return {
     ...apiProduct,
     _id: apiProduct.id?.toString() ?? '', // pour la clé du template
-    images: Array.isArray(apiProduct.images) ? apiProduct.images : [],
+    images,
+    price: Number(apiProduct.price) || 0,
+    salePrice: apiProduct.salePrice !== undefined ? Number(apiProduct.salePrice) : undefined,
     stock: {
       quantity: apiProduct.stockQuantity ?? 0,
       reserved: apiProduct.stock?.reserved ?? 0,

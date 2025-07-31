@@ -87,17 +87,30 @@
             <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ product.name }}</h1>
             
             <!-- Prix -->
-            <div class="flex items-center space-x-4 mb-4">
-              <span v-if="product.isOnSale && product.salePrice" class="text-4xl font-bold text-red-500">
-                {{ product.salePrice }}€
+            <div class="flex flex-col items-start space-y-1 mb-4">
+              <span class="text-4xl font-bold" :class="product.isOnSale && product.salePrice ? 'text-red-500' : 'text-gray-900'">
+                {{
+                  product && typeof product.price === 'number' && product.price > 0
+                    ? (product.isOnSale && typeof product.salePrice === 'number' && product.salePrice > 0
+                        ? product.salePrice.toFixed(2)
+                        : product.price.toFixed(2))
+                    : '--'
+                }}€ TTC
               </span>
-              <span :class="product.isOnSale && product.salePrice ? 'line-through text-gray-400 text-2xl' : 'text-4xl font-bold text-gray-900'">
-                {{ product.price }}€
+              <span class="text-xs text-gray-500">
+                HT : {{
+                  product && typeof product.price === 'number' && product.price > 0
+                    ? ((product.isOnSale && typeof product.salePrice === 'number' && product.salePrice > 0
+                        ? product.salePrice / 1.2
+                        : product.price / 1.2).toFixed(2))
+                    : '--'
+                }}€
+              </span>
+              <span v-if="product.isOnSale && typeof product.salePrice === 'number' && product.salePrice > 0" class="line-through text-gray-400 text-2xl">
+                {{ product.price && typeof product.price === 'number' ? product.price.toFixed(2) : '--' }}€ TTC
               </span>
             </div>
-            
-            <!-- Économie -->
-            <div v-if="product.isOnSale && product.salePrice" class="text-green-600 font-medium mb-4">
+            <div v-if="product.isOnSale && typeof product.salePrice === 'number' && product.salePrice > 0 && typeof product.price === 'number' && product.price > 0" class="text-green-600 font-medium mb-4">
               Vous économisez {{ (product.price - product.salePrice).toFixed(2) }}€
             </div>
           </div>
@@ -340,8 +353,12 @@ const loadProduct = async () => {
     const response = await productService.getProduct(productId)
     
     if (response.success && response.data) {
-      product.value = response.data
-      
+      // On force price et salePrice à être des nombres pour éviter les bugs d'affichage
+      const prod = response.data
+      prod.price = Number(prod.price) || 0
+      prod.salePrice = prod.salePrice !== undefined ? Number(prod.salePrice) : undefined
+      product.value = prod
+
       // Charger les produits similaires (même catégorie)
       if (product.value && product.value.categoryId) {
         const similarResponse = await productService.getProducts({
@@ -350,7 +367,7 @@ const loadProduct = async () => {
         })
         
         if (similarResponse.success && similarResponse.data && similarResponse.data.products) {
-          similarProducts.value = similarResponse.data.products.filter(p => p.id !== product.value!.id)
+          similarProducts.value = similarResponse.data.products.filter((p: any) => p.id !== product.value!.id)
         }
       }
     } else {

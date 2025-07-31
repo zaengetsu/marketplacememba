@@ -144,8 +144,16 @@
               <div class="card-body">
                 <div class="space-y-3">
                   <div class="flex justify-between">
-                    <span>Sous-total</span>
-                    <span>{{ cartStore.totalPrice.toFixed(2) }}€</span>
+                    <span>Sous-total HT</span>
+                    <span>{{ totalHT.toFixed(2) }}€</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>TVA (20%)</span>
+                    <span>{{ tva.toFixed(2) }}€</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Sous-total TTC</span>
+                    <span>{{ totalTTC.toFixed(2) }}€</span>
                   </div>
                   <div class="flex justify-between">
                     <span>Livraison</span>
@@ -153,8 +161,8 @@
                   </div>
                   <hr>
                   <div class="flex justify-between font-semibold text-lg">
-                    <span>Total</span>
-                    <span>{{ (cartStore.totalPrice + shippingCost).toFixed(2) }}€</span>
+                    <span>Total à payer</span>
+                    <span>{{ (totalTTC + shippingCost).toFixed(2) }}€</span>
                   </div>
                 </div>
 
@@ -235,9 +243,15 @@ const shippingData = ref({
   instructions: ''
 })
 
+
 const shippingCost = computed(() => {
   return cartStore.totalPrice >= 50 ? 0 : 5.99
 })
+
+// Calcul HT, TVA, TTC
+const totalTTC = computed(() => cartStore.totalPrice)
+const totalHT = computed(() => totalTTC.value / 1.2)
+const tva = computed(() => totalTTC.value - totalHT.value)
 
 const getCurrentPrice = (product: Product) => {
   if (!product) return 0

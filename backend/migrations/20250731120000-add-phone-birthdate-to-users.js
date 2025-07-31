@@ -2,14 +2,21 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn("Users", "phone", {
-      type: Sequelize.STRING,
-      allowNull: true
-    });
-    await queryInterface.addColumn("Users", "birthDate", {
-      type: Sequelize.DATE,
-      allowNull: true
-    });
+    // Ajoute la colonne phone si elle n'existe pas
+    const table = await queryInterface.describeTable('Users');
+    if (!table.phone) {
+      await queryInterface.addColumn('Users', 'phone', {
+        type: Sequelize.STRING,
+        allowNull: true
+      });
+    }
+    // Ajoute la colonne birthDate si elle n'existe pas
+    if (!table.birthDate) {
+      await queryInterface.addColumn('Users', 'birthDate', {
+        type: Sequelize.DATE,
+        allowNull: true
+      });
+    }
   },
 
   down: async (queryInterface, Sequelize) => {

@@ -35,6 +35,11 @@
               <div>
                 <h3 class="font-medium mb-2">Total</h3>
                 <p class="text-xl font-semibold">{{ parseFloat(order.total.toString()).toFixed(2) }}€</p>
+                <div class="text-sm mt-2">
+                  <div>Sous-total HT : <span class="font-semibold">{{ totalHT(order).toFixed(2) }}€</span></div>
+                  <div>TVA (20%) : <span class="font-semibold">{{ tva(order).toFixed(2) }}€</span></div>
+                  <div>Total TTC : <span class="font-semibold">{{ parseFloat(order.total.toString()).toFixed(2) }}€</span></div>
+                </div>
               </div>
               <div>
                 <h3 class="font-medium mb-2">Date de commande</h3>
@@ -150,6 +155,16 @@ onMounted(async () => {
   
   loading.value = false
 })
+
+// Calcul HT/TVA/TTC à partir du total TTC (20% TVA)
+const totalHT = (order: any) => {
+  if (!order || !order.total) return 0
+  return parseFloat(order.total) / 1.2
+}
+const tva = (order: any) => {
+  if (!order || !order.total) return 0
+  return parseFloat(order.total) - totalHT(order)
+}
 
 const getStatusClass = (status: string) => {
   const classes = {

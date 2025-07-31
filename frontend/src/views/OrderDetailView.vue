@@ -153,19 +153,19 @@
 
             <dl class="mt-8 divide-y divide-gray-200 text-sm lg:col-span-7 lg:mt-0 lg:pr-8">
               <div class="flex items-center justify-between pb-4">
-                <dt class="text-gray-600">Sous-total</dt>
-                <dd class="font-medium text-gray-900">{{ order.summary.subtotal }}</dd>
+                <dt class="text-gray-600">Sous-total HT</dt>
+                <dd class="font-medium text-gray-900">{{ totalHT(order).toFixed(2) }}€</dd>
+              </div>
+              <div class="flex items-center justify-between py-4">
+                <dt class="text-gray-600">TVA (20%)</dt>
+                <dd class="font-medium text-gray-900">{{ tva(order).toFixed(2) }}€</dd>
               </div>
               <div class="flex items-center justify-between py-4">
                 <dt class="text-gray-600">Livraison</dt>
                 <dd class="font-medium text-gray-900">{{ order.summary.shipping }}</dd>
               </div>
-              <div class="flex items-center justify-between py-4">
-                <dt class="text-gray-600">TVA</dt>
-                <dd class="font-medium text-gray-900">{{ order.summary.tax }}</dd>
-              </div>
               <div class="flex items-center justify-between pt-4">
-                <dt class="font-medium text-gray-900">Total de la commande</dt>
+                <dt class="font-medium text-gray-900">Total TTC</dt>
                 <dd class="font-medium text-orange-600">{{ order.summary.total }}</dd>
               </div>
             </dl>
@@ -298,4 +298,14 @@ onMounted(() => {
     loading.value = false
   }, 1000)
 })
-</script> 
+// Helpers pour HT/TVA/TTC
+const parseEuro = (str: string) => parseFloat(str.replace(',', '.').replace('€', '').trim())
+const totalHT = (order: any) => {
+  if (!order || !order.summary || !order.summary.total) return 0
+  return parseEuro(order.summary.total) / 1.2
+}
+const tva = (order: any) => {
+  if (!order || !order.summary || !order.summary.total) return 0
+  return parseEuro(order.summary.total) - totalHT(order)
+}
+</script>

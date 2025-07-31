@@ -25,7 +25,7 @@ const submit = async () => {
   error.value = '';
   try {
     const res = await auth.forgotPassword(email.value);
-    message.value = res.message;
+    message.value = res.message ?? '';
   } catch (err: any) {
     error.value = err.message || 'Erreur';
   }

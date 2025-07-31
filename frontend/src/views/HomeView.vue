@@ -37,24 +37,28 @@
             <div class="card-body">
               <h3 class="font-semibold text-lg mb-2">{{ product.name }}</h3>
               <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ product.description }}</p>
-              <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                  <span v-if="product.isOnSale" class="text-red-500 font-bold">
-                    {{ product.salePrice }}€
-                  </span>
-                  <span :class="product.isOnSale ? 'line-through text-gray-400' : 'font-bold text-gray-900'">
-                    {{ product.price }}€
-                  </span>
-                </div>
-                <button 
-                  @click="addToCart(product)"
-                  :disabled="!product.stockQuantity"
-                  class="btn btn-primary btn-sm"
-                  :class="{ 'opacity-50 cursor-not-allowed': !product.stockQuantity }"
-                >
-                  {{ product.stockQuantity ? 'Ajouter' : 'Rupture' }}
-                </button>
+              <div class="flex flex-col items-start space-y-1 mb-2">
+                <span class="font-bold text-gray-900">
+                  {{ (product.isOnSale && product.salePrice ? product.salePrice : product.price).toFixed(2) }}€ TTC
+                </span>
+                <span class="text-xs text-gray-500">
+                  HT : {{ ((product.isOnSale && product.salePrice ? product.salePrice : product.price) / 1.2).toFixed(2) }}€
+                </span>
+                <span v-if="product.isOnSale && product.salePrice" class="line-through text-gray-400 text-sm">
+                  {{ product.price.toFixed(2) }}€ TTC
+                </span>
+                <span v-if="product.isOnSale && product.salePrice" class="text-green-600 text-xs font-medium">
+                  Économisez {{ (product.price - product.salePrice).toFixed(2) }}€
+                </span>
               </div>
+              <button 
+                @click="addToCart(product)"
+                :disabled="!product.stockQuantity"
+                class="btn btn-primary btn-sm"
+                :class="{ 'opacity-50 cursor-not-allowed': !product.stockQuantity }"
+              >
+                {{ product.stockQuantity ? 'Ajouter' : 'Rupture' }}
+              </button>
             </div>
           </div>
         </div>
@@ -132,7 +136,13 @@ const loadProducts = async () => {
     })
     
     if (response.success && response.data && response.data.products) {
-      products.value = response.data.products
+      products.value = response.data.products.map((prod: any) => {
+        return {
+          ...prod,
+          price: Number(prod.price) || 0,
+          salePrice: prod.salePrice !== undefined ? Number(prod.salePrice) : undefined
+        }
+      })
     } else {
       error.value = 'Erreur lors du chargement des produits'
     }

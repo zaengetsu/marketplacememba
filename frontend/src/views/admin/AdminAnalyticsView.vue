@@ -113,14 +113,14 @@ const usersChartData = computed(() => ({
 
 const ordersStatusChartData = computed(() => ({
   labels: Object.keys(ordersByStatus.value),
-  datasets: [
-    {
-      data: Object.values(ordersByStatus.value),
-      backgroundColor: [
-        '#fbbf24', '#34d399', '#60a5fa', '#a78bfa', '#f87171', '#f472b6', '#818cf8'
-      ]
-    }
-  ]
+        datasets: [
+          {
+            data: Object.values(ordersByStatus.value).map(v => Number(v)),
+            backgroundColor: [
+              '#fbbf24', '#34d399', '#60a5fa', '#a78bfa', '#f87171', '#f472b6', '#818cf8'
+            ]
+          }
+        ]
 }))
 
 const revenueChartData = computed(() => ({

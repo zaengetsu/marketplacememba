@@ -127,13 +127,18 @@
                     {{ product.name }}
                   </router-link>
                 </h3>
-                <div class="flex items-center space-x-2">
-                  <span v-if="product.isOnSale && product.salePrice" class="text-orange-600 font-bold">
-                    {{ formatCurrency(product.salePrice) }}
+                <div class="flex flex-col items-end space-y-1">
+                  <span class="text-orange-600 font-bold">
+                    {{ formatCurrency(product.isOnSale && product.salePrice ? product.salePrice : product.price) }} TTC
                   </span>
-                  <span
-                    :class="product.isOnSale && product.salePrice ? 'line-through text-gray-400 text-sm' : 'text-orange-600 font-bold'">
+                  <span class="text-xs text-gray-500">
+                    HT : {{ formatCurrency((product.isOnSale && product.salePrice ? product.salePrice : product.price) / 1.2) }}
+                  </span>
+                  <span v-if="product.isOnSale && product.salePrice" class="line-through text-gray-400 text-sm">
                     {{ formatCurrency(product.price) }}
+                  </span>
+                  <span v-if="product.isOnSale && product.salePrice" class="text-green-600 text-xs font-medium">
+                    Économisez {{ formatCurrency(product.price - product.salePrice) }}
                   </span>
                 </div>
               </div>
@@ -263,7 +268,14 @@ const loadProducts = async () => {
     const response = await productService.getProducts(params)
 
     if (response.success && response.data) {
-      products.value = response.data.products || []
+      // On force price et salePrice à être des nombres pour chaque produit
+      products.value = (response.data.products || []).map((prod: any) => {
+        return {
+          ...prod,
+          price: Number(prod.price) || 0,
+          salePrice: prod.salePrice !== undefined ? Number(prod.salePrice) : undefined
+        }
+      })
       if (response.data.pagination) {
         totalProducts.value = response.data.pagination.total
         totalPages.value = response.data.pagination.pages

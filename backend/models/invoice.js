@@ -19,8 +19,13 @@ module.exports = (sequelize, DataTypes) => {
   }
   Invoice.init({
     orderId: DataTypes.INTEGER,
+    userId: DataTypes.INTEGER,
     invoiceNumber: DataTypes.STRING,
     amount: DataTypes.DECIMAL,
+    totalHT: DataTypes.DECIMAL,
+    tva: DataTypes.DECIMAL,
+    totalTTC: DataTypes.DECIMAL,
+    pdfPath: DataTypes.STRING,
     status: {
       type: DataTypes.ENUM,
       values: ['draft', 'sent', 'paid', 'overdue', 'cancelled'],
