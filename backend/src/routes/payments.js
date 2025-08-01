@@ -56,6 +56,16 @@ router.post('/create-intent', authenticate, async (req, res) => {
 
         if (order) {
           await order.update({ status: 'confirmed' });
+          // Décrémente le stock des produits commandés (Sequelize)
+          for (const item of order.orderItems) {
+            const product = item.Product;
+            if (product && typeof product.stockQuantity === 'number') {
+              const oldQty = product.stockQuantity;
+              product.stockQuantity = Math.max(0, oldQty - item.quantity);
+              await product.save();
+              logger.info(`Stock décrémenté pour le produit ${product.id}: ${oldQty} -> ${product.stockQuantity}`);
+            }
+          }
 
           // Calcul HT/TVA/TTC (taux 20% par défaut)
           const tvaRate = 0.2;

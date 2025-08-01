@@ -317,7 +317,7 @@ const getProductImage = (product: Product) => {
 // Actions
 const addToCart = async () => {
   if (!product.value) return
-  
+
   isAdding.value = true
   try {
     // Convertir le produit au format attendu par le cart store
@@ -331,9 +331,12 @@ const addToCart = async () => {
       },
       images: [{ url: getProductImage(product.value), alt: product.value.name, isPrimary: true }]
     }
-    
+
     await cartStore.addItem(cartProduct as any, quantity.value)
     toast.success(`${quantity.value} ${product.value.name} ajouté(s) au panier`)
+
+    // Recharge le produit pour afficher le stock à jour
+    await loadProduct()
   } catch (error) {
     console.error('Erreur lors de l\'ajout au panier:', error)
     toast.error('Erreur lors de l\'ajout au panier')
