@@ -157,6 +157,7 @@ import { useCartStore } from '@/stores/cart'
 import { useToast } from 'vue-toastification'
 import { productService } from '@/services/api'
 import type { Product } from '@/types/product'
+import { getProductImageUrl } from '@/utils/image'
 
 const cartStore = useCartStore()
 const toast = useToast()
@@ -248,8 +249,8 @@ const clearAllFavorites = async () => {
 }
 
 const getProductImage = (product: Product) => {
-  const categorySlug = product.category?.slug || 'accessoires'
-  return categoryImages[categorySlug] || categoryImages['accessoires']
+  // Utilise la fonction utilitaire commune
+  return getProductImageUrl(product)
 }
 
 const addToCart = async (product: Product) => {

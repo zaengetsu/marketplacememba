@@ -187,8 +187,15 @@
                 </span>
               </button>
               
-              <button class="btn btn-outline py-4 px-6">
-                ❤️
+              <button 
+                class="btn btn-outline py-4 px-6 flex items-center justify-center text-xl"
+                :class="isFavorite ? 'text-red-500' : 'text-gray-500'"
+                @click="toggleFavorite"
+                :aria-pressed="isFavorite"
+                :title="isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'"
+              >
+                <span v-if="isFavorite">❤️</span>
+                <span v-else>🤍</span>
               </button>
               
               <button class="btn btn-outline py-4 px-6">
@@ -294,6 +301,47 @@ const quantity = ref(1)
 const isAdding = ref(false)
 const selectedImage = ref<any>(null)
 
+// Favoris
+const isFavorite = ref(false)
+
+const checkFavorite = () => {
+  if (!product.value) {
+    isFavorite.value = false
+    return
+  }
+  const savedFavorites = localStorage.getItem('userFavorites')
+  if (!savedFavorites) {
+    isFavorite.value = false
+    return
+  }
+  const favoriteIds = JSON.parse(savedFavorites)
+  isFavorite.value = Array.isArray(favoriteIds) && favoriteIds.includes(product.value.id)
+}
+
+const toggleFavorite = () => {
+  if (!product.value) return
+  const savedFavorites = localStorage.getItem('userFavorites')
+  let favoriteIds: number[] = []
+  if (savedFavorites) {
+    try {
+      favoriteIds = JSON.parse(savedFavorites)
+    } catch {
+      favoriteIds = []
+    }
+  }
+  if (isFavorite.value) {
+    // Retirer
+    favoriteIds = favoriteIds.filter(id => id !== product.value!.id)
+    toast.success('Produit retiré des favoris')
+  } else {
+    // Ajouter
+    favoriteIds.push(product.value.id)
+    toast.success('Produit ajouté aux favoris')
+  }
+  localStorage.setItem('userFavorites', JSON.stringify(favoriteIds))
+  isFavorite.value = !isFavorite.value
+}
+
 // Méthodes utilitaires
 const getStockClass = (stockQuantity: number) => {
   if (stockQuantity === 0) return 'text-red-600'
@@ -394,5 +442,10 @@ watch(() => route.params.id, () => {
 
 onMounted(() => {
   loadProduct()
+})
+
+// Vérifier l’état favori à chaque chargement produit
+watch(product, () => {
+  checkFavorite()
 })
 </script> 

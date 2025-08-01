@@ -23,17 +23,17 @@
               checkoutStep >= 1 ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-600'
             ]">1</div>
             <span :class="checkoutStep >= 1 ? 'text-orange-600 font-medium' : 'text-gray-600'">Panier</span>
-            
+
             <div class="flex-1 h-0.5 bg-gray-200"></div>
-            
+
             <div :class="[
               'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium',
               checkoutStep >= 2 ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-600'
             ]">2</div>
             <span :class="checkoutStep >= 2 ? 'text-orange-600 font-medium' : 'text-gray-600'">Livraison</span>
-            
+
             <div class="flex-1 h-0.5 bg-gray-200"></div>
-            
+
             <div :class="[
               'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium',
               checkoutStep >= 3 ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-600'
@@ -45,7 +45,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <!-- Contenu principal -->
           <div class="lg:col-span-2">
-            
+
             <!-- Étape 1: Articles du panier -->
             <div v-if="checkoutStep === 1" class="card">
               <div class="card-header">
@@ -56,7 +56,8 @@
                   class="flex items-center p-6 border-b border-gray-200 last:border-b-0">
                   <!-- Image du produit -->
                   <div class="w-20 h-20 bg-gray-200 rounded-lg overflow-hidden mr-4">
-                    <img :src="'/placeholder.jpg'" :alt="item.product.name" class="w-full h-full object-cover">
+                    <img :src="getProductImage(item.product)" :alt="item.product.name"
+                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                   </div>
 
                   <!-- Détails du produit -->
@@ -168,38 +169,22 @@
 
                 <!-- Boutons d'action selon l'étape -->
                 <div class="mt-6 space-y-3">
-                  <button 
-                    v-if="checkoutStep === 1" 
-                    @click="checkoutStep = 2" 
-                    class="w-full btn btn-primary"
-                  >
+                  <button v-if="checkoutStep === 1" @click="checkoutStep = 2" class="w-full btn btn-primary">
                     Continuer vers la livraison
                   </button>
-                  
-                  <button 
-                    v-if="checkoutStep === 2" 
-                    @click="checkoutStep = 1" 
-                    class="w-full btn btn-outline"
-                  >
+
+                  <button v-if="checkoutStep === 2" @click="checkoutStep = 1" class="w-full btn btn-outline">
                     Retour au panier
                   </button>
-                  
-                  <button 
-                    v-if="checkoutStep === 3" 
-                    @click="proceedToCheckout" 
-                    :disabled="checkoutLoading" 
-                    class="w-full btn btn-primary"
-                  >
+
+                  <button v-if="checkoutStep === 3" @click="proceedToCheckout" :disabled="checkoutLoading"
+                    class="w-full btn btn-primary">
                     <div v-if="checkoutLoading"
                       class="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     {{ checkoutLoading ? 'Redirection...' : 'Procéder au paiement' }}
                   </button>
 
-                  <button 
-                    v-if="checkoutStep === 3" 
-                    @click="checkoutStep = 2" 
-                    class="w-full btn btn-outline"
-                  >
+                  <button v-if="checkoutStep === 3" @click="checkoutStep = 2" class="w-full btn btn-outline">
                     Modifier la livraison
                   </button>
                 </div>
@@ -224,11 +209,16 @@ import { useOrderStore } from '@/stores/orders'
 import { useAuthStore } from '@/stores/auth'
 import ShippingForm from '@/components/ShippingForm.vue'
 import type { Product } from '@/types/product'
+import { getProductImageUrl } from '@/utils/image'
 
 const router = useRouter()
 const cartStore = useCartStore()
 const orderStore = useOrderStore()
 const authStore = useAuthStore()
+const getProductImage = (product: Product) => {
+  // Utilise la fonction utilitaire commune
+  return getProductImageUrl(product)
+}
 
 const checkoutStep = ref(1) // 1: Panier, 2: Livraison, 3: Confirmation
 const checkoutLoading = ref(false)
@@ -247,7 +237,7 @@ const shippingData = ref({
 const shippingCost = computed(() => {
   return cartStore.totalPrice >= 50 ? 0 : 5.99
 })
-
+ 
 // Calcul HT, TVA, TTC
 const totalTTC = computed(() => cartStore.totalPrice)
 const totalHT = computed(() => totalTTC.value / 1.2)
@@ -322,9 +312,9 @@ const proceedToCheckout = async () => {
         shippingCost: shippingCost.value
       })
     })
-    
+
     const data = await res.json()
-    
+
     if (data.success && data.url) {
       // Vider le panier avant la redirection
       cartStore.clearCart()

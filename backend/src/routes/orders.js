@@ -99,6 +99,24 @@ router.post('/', authenticate, async (req, res) => {
       });
     }
 
+    // Vérification du stock avant création de la commande
+    const { Product, OrderItem } = require('../../models');
+    for (const item of items) {
+      const product = await Product.findByPk(item.productId);
+      if (!product) {
+        return res.status(400).json({
+          success: false,
+          message: `Produit introuvable (ID: ${item.productId})`
+        });
+      }
+      if (product.stockQuantity < item.quantity) {
+        return res.status(400).json({
+          success: false,
+          message: `Stock insuffisant pour le produit ${product.name} (disponible: ${product.stockQuantity}, demandé: ${item.quantity})`
+        });
+      }
+    }
+
     const order = await Order.create({
       userId: req.user.id,
       total: parseFloat(total),
@@ -107,7 +125,6 @@ router.post('/', authenticate, async (req, res) => {
       status: 'pending'
     });
 
-    const{ OrderItem } = require('../../models'); 
     for (const item of items) {
       await OrderItem.create({
         orderId: order.id,

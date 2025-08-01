@@ -75,13 +75,20 @@ export const useCartStore = defineStore('cart', () => {
   }
 
   const removeItem = (productId: string) => {
-    items.value = items.value.filter(item => item.product.id.toString() !== productId)
+    items.value = items.value.filter(item => {
+      // Sécurise l'accès à item.product.id
+      if (!item.product || typeof item.product.id === 'undefined' || item.product.id === null) return true
+      return item.product.id.toString() !== productId
+    })
     saveToStorage()
     toast.success('Produit retiré du panier')
   }
 
   const updateQuantity = (productId: string, quantity: number) => {
-    const item = items.value.find(item => item.product.id.toString() === productId)
+    const item = items.value.find(item => {
+      if (!item.product || typeof item.product.id === 'undefined' || item.product.id === null) return false
+      return item.product.id.toString() === productId
+    })
     if (item) {
       const availableStock = item.product.stockQuantity
       if (quantity > availableStock) {
