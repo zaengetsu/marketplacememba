@@ -30,6 +30,10 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 'pending'
     },
     total: DataTypes.DECIMAL,
+    shippingCost: {
+      type: DataTypes.DECIMAL,
+      defaultValue: 0
+    },
     shippingAddress: DataTypes.JSON,
     billingAddress: DataTypes.JSON
   }, {

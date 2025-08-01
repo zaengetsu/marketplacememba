@@ -117,6 +117,7 @@
               <ul v-if="authStore.isAuthenticated" class="p-2 text-start text-sm font-medium text-gray-900">
                 <li><router-link to="/profile" @click="showUserDropdown = false" class="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100">Mon Compte</router-link></li>
                 <li><router-link to="/orders" @click="showUserDropdown = false" class="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100">Mes Commandes</router-link></li>
+               <li><router-link to="/invoices" @click="showUserDropdown = false" class="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100">Mes Factures</router-link></li>
                 <li><router-link to="/favorites" @click="showUserDropdown = false" class="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100">Favoris</router-link></li>
                 <li v-if="authStore.user?.role === 'ROLE_ADMIN'"><router-link to="/admin" @click="showUserDropdown = false" class="inline-flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-gray-100">Administration</router-link></li>
               </ul>

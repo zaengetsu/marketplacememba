@@ -28,7 +28,7 @@
               <div>
                 <h3 class="text-lg font-semibold">{{ invoice.invoiceNumber }}</h3>
                 <p class="text-gray-600 text-sm">
-                  Émise le {{ formatDate(invoice.issuedAt) }}
+                  Émise le {{ formatDate(new Date(invoice.issuedAt)) }}
                 </p>
                 <p v-if="invoice.order" class="text-gray-600 text-sm">
                   Commande #{{ invoice.order.id }}
@@ -38,19 +38,24 @@
                 <span :class="getStatusClass(invoice.status)" class="px-3 py-1 rounded-full text-sm font-medium">
                   {{ getStatusText(invoice.status) }}
                 </span>
-                <span class="text-lg font-semibold">{{ parseFloat(invoice.amount.toString()).toFixed(2) }}€</span>
+                <span class="text-lg font-semibold">
+                  {{ (Number(invoice.amount) + Number(invoice.order?.shippingCost || 0)).toFixed(2) }}€
+                </span>
               </div>
+            </div>
+            <div v-if="invoice.order?.shippingCost && invoice.order.shippingCost > 0" class="text-sm text-gray-500 mb-2">
+              Livraison : {{ Number(invoice.order.shippingCost).toFixed(2) }}€ incluse
             </div>
 
             <!-- Informations détaillées -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 text-sm">
               <div>
                 <span class="text-gray-500">Date d'échéance :</span>
-                <span class="ml-2">{{ formatDate(invoice.dueAt) }}</span>
+                <span class="ml-2">{{ formatDate(new Date(invoice.dueAt)) }}</span>
               </div>
               <div v-if="invoice.paidAt">
                 <span class="text-gray-500">Payée le :</span>
-                <span class="ml-2 text-green-600 font-medium">{{ formatDate(invoice.paidAt) }}</span>
+                <span class="ml-2 text-green-600 font-medium">{{ formatDate(new Date(invoice.paidAt)) }}</span>
               </div>
             </div>
 
@@ -120,30 +125,35 @@
             </div>
 
             <div>
-              <h3 class="font-medium mb-2">Montant</h3>
-              <span class="text-xl font-semibold">{{ parseFloat(selectedInvoice.amount.toString()).toFixed(2) }}€</span>
+              <h3 class="font-medium mb-2">Montant payé</h3>
+              <span class="text-xl font-semibold">
+                {{ (Number(selectedInvoice.amount) + Number(selectedInvoice.order?.shippingCost || 0)).toFixed(2) }}€
+              </span>
+              <div v-if="selectedInvoice.order?.shippingCost && selectedInvoice.order.shippingCost > 0" class="text-sm text-gray-500 mt-1">
+                Livraison : {{ Number(selectedInvoice.order.shippingCost).toFixed(2) }}€ incluse
+              </div>
             </div>
 
             <div>
               <h3 class="font-medium mb-2">Date d'émission</h3>
-              <p class="text-gray-600">{{ formatDate(selectedInvoice.issuedAt) }}</p>
+              <p class="text-gray-600">{{ formatDate(new Date(selectedInvoice.issuedAt)) }}</p>
             </div>
 
             <div>
               <h3 class="font-medium mb-2">Date d'échéance</h3>
-              <p class="text-gray-600">{{ formatDate(selectedInvoice.dueAt) }}</p>
+              <p class="text-gray-600">{{ formatDate(new Date(selectedInvoice.dueAt)) }}</p>
             </div>
 
             <div v-if="selectedInvoice.paidAt">
               <h3 class="font-medium mb-2">Date de paiement</h3>
-              <p class="text-green-600 font-medium">{{ formatDate(selectedInvoice.paidAt) }}</p>
+              <p class="text-green-600 font-medium">{{ formatDate(new Date(selectedInvoice.paidAt)) }}</p>
             </div>
 
             <div v-if="selectedInvoice.order">
               <h3 class="font-medium mb-2">Commande liée</h3>
               <p class="text-gray-600">
-                                 Commande #{{ selectedInvoice.order.id }} 
-                ({{ parseFloat(selectedInvoice.order.total.toString()).toFixed(2) }}€)
+                Commande #{{ selectedInvoice.order.id }} 
+                ({{ (Number(selectedInvoice.order.total) + Number(selectedInvoice.order.shippingCost || 0)).toFixed(2) }}€)
               </p>
             </div>
           </div>

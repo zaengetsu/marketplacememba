@@ -19,6 +19,10 @@ module.exports = {
       total: {
         type: Sequelize.DECIMAL
       },
+      shippingCost: {
+        type: Sequelize.DECIMAL,
+        defaultValue: 0
+      },
       shippingAddress: {
         type: Sequelize.JSON
       },

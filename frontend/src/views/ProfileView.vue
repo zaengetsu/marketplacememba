@@ -24,7 +24,7 @@
             </div>
 
             <nav class="space-y-2">
-              <button v-for="tab in tabs" :key="tab.id" @click="activeTab = tab.id" :class="[
+              <button v-for="tab in tabs" :key="tab.id" @click="activeTab = tab.id as typeof activeTab" :class="[
                 'w-full text-left px-4 py-3 rounded-lg transition-colors',
                 activeTab === tab.id
                   ? 'bg-orange-50 text-orange-600 border border-orange-200'
@@ -43,7 +43,6 @@
             <!-- Personal Information Tab -->
             <div v-if="activeTab === 'personal'" class="p-6">
               <h2 class="text-xl font-semibold text-gray-900 mb-6">Informations personnelles</h2>
-
               <form @submit="handlePersonalInfoSubmit" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -55,7 +54,6 @@
                       {{ personalForm.errors.value.firstName }}
                     </p>
                   </div>
-
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Nom</label>
                     <input v-model="personalForm.data.lastName" type="text"
@@ -66,7 +64,6 @@
                     </p>
                   </div>
                 </div>
-
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
                   <input v-model="personalForm.data.email" type="email"
@@ -76,7 +73,6 @@
                     {{ personalForm.errors.value.email }}
                   </p>
                 </div>
-
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
                   <input v-model="personalForm.data.phone" type="tel"
@@ -86,172 +82,215 @@
                     {{ personalForm.errors.value.phone }}
                   </p>
                 </div>
-
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Date de naissance</label>
                   <input v-model="personalForm.data.birthDate" type="date"
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" />
                 </div>
-
                 <div class="flex justify-end">
                   <button type="button" @click="exportMyData"
                     class="flex items-center px-5 py-3 bg-gradient-to-r from-orange-100 to-orange-200 text-orange-700 font-semibold rounded-lg border border-orange-300 hover:from-orange-200 hover:to-orange-300 hover:text-orange-800 shadow-sm transition-all mr-3">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4m-8 8h8"/></svg>
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4m-8 8h8" />
+                    </svg>
                     Exporter mes données
                   </button>
                   <button type="button" @click="deleteMyAccount"
                     class="flex items-center px-5 py-3 bg-gradient-to-r from-red-100 to-red-200 text-red-700 font-semibold rounded-lg border border-red-300 hover:from-red-200 hover:to-red-300 hover:text-red-800 shadow-sm transition-all mr-3">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                     Supprimer mon compte
                   </button>
                   <button type="submit" :disabled="personalForm.isLoading.value"
                     class="flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-red-700 shadow-sm transition-all disabled:opacity-50">
-                    <svg v-if="personalForm.isLoading" class="w-5 h-5 mr-2 animate-spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
+                    <svg v-if="personalForm.isLoading" class="w-5 h-5 mr-2 animate-spin" fill="none"
+                      stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                    </svg>
                     {{ personalForm.isLoading ? 'Enregistrement...' : 'Enregistrer' }}
                   </button>
                 </div>
               </form>
             </div>
-
-            <!-- Password Tab -->
-            <div v-if="activeTab === 'password'" class="p-6">
-              <h2 class="text-xl font-semibold text-gray-900 mb-6">Changer le mot de passe</h2>
-
-              <form @submit="handlePasswordSubmit" class="space-y-6">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Mot de passe actuel</label>
-                  <input v-model="passwordForm.data.currentPassword" type="password"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    :class="{ 'border-red-500': passwordForm.errors.value.currentPassword }" />
-                  <p v-if="passwordForm.errors.value.currentPassword" class="text-red-500 text-sm mt-1">
-                    {{ passwordForm.errors.value.currentPassword }}
-                  </p>
-                </div>
-
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Nouveau mot de passe</label>
-                  <input v-model="passwordForm.data.newPassword" type="password"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    :class="{ 'border-red-500': passwordForm.errors.value.newPassword }" />
-                  <p v-if="passwordForm.errors.value.newPassword" class="text-red-500 text-sm mt-1">
-                    {{ passwordForm.errors.value.newPassword }}
-                  </p>
-                </div>
-
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Confirmer le nouveau mot de passe</label>
-                  <input v-model="passwordForm.data.confirmPassword" type="password"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    :class="{ 'border-red-500': passwordForm.errors.value.confirmPassword }" />
-                  <p v-if="passwordForm.errors.value.confirmPassword" class="text-red-500 text-sm mt-1">
-                    {{ passwordForm.errors.value.confirmPassword }}
-                  </p>
-                </div>
-
-                <div class="flex justify-end">
-                  <button type="submit" :disabled="passwordForm.isLoading.value"
-                    class="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition-all disabled:opacity-50">
-                    {{ passwordForm.isLoading ? 'Modification...' : 'Modifier le mot de passe' }}
-                  </button>
-                </div>
-              </form>
-            </div>
-
-            <!-- Orders Tab -->
-            <div v-if="activeTab === 'orders'" class="p-6">
+            <!-- Invoices Tab (toutes les factures) -->
+            <div v-if="activeTab === 'invoices'" class="p-6">
               <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-semibold text-gray-900">Mes commandes</h2>
-                <router-link to="/orders" class="text-orange-600 hover:text-orange-700 font-medium">
-                  Voir toutes les commandes →
+                <h2 class="text-xl font-semibold text-gray-900">Mes factures</h2>
+                <router-link to="/invoices" class="text-orange-600 hover:text-orange-700 font-medium">
+                  Voir toutes les factures →
                 </router-link>
               </div>
-
               <div class="space-y-4">
-                <div v-for="order in recentOrders" :key="order.id"
+                <div v-for="invoice in recentInvoices" :key="invoice.id"
                   class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                   <div class="flex justify-between items-start mb-2">
                     <div>
-                      <h3 class="font-medium text-gray-900">Commande #{{ order.id }}</h3>
-                      <p class="text-sm text-gray-600">{{ formatDate(new Date(order.createdAt)) }}</p>
+                      <h3 class="font-semibold text-gray-900">{{ invoice.invoiceNumber }}</h3>
+                      <p class="text-gray-600 text-sm">Émise le {{ formatDate(new Date(invoice.issuedAt)) }}</p>
+                      <p v-if="invoice.order" class="text-gray-600 text-sm">Commande #{{ invoice.order.id }}</p>
                     </div>
-                    <span :class="[
-                      'px-3 py-1 rounded-full text-xs font-medium',
-                      order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                        order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                          order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-gray-100 text-gray-800'
-                    ]">
-                      {{ getStatusLabel(order.status) }}
+                    <span :class="getStatusClass(invoice.status)" class="px-3 py-1 rounded-full text-sm font-medium">
+                      {{ getStatusText(invoice.status) }}
                     </span>
                   </div>
-                  <div class="flex justify-between items-center">
-                    <p class="text-sm text-gray-600">1 article</p>
-                    <p class="font-semibold text-gray-900">{{ formatCurrency(order.total) }}</p>
+                  <div class="flex justify-between items-center mt-2">
+                    <span class="text-lg font-semibold">
+                      {{ (Number(invoice.amount) + Number(invoice.order?.shippingCost || 0)).toFixed(2) }}€
+                    </span>
+                    <router-link :to="`/invoices`" class="btn btn-outline btn-sm">Voir</router-link>
+                  </div>
+                  <div v-if="invoice.order?.shippingCost && invoice.order.shippingCost > 0"
+                    class="text-sm text-gray-500 mt-1">
+                    Livraison : {{ Number(invoice.order.shippingCost).toFixed(2) }}€ incluse
                   </div>
                 </div>
-
-                <div v-if="recentOrders.length === 0" class="text-center py-8 text-gray-500">
-                  Aucune commande récente
+                <div v-if="recentInvoices.length === 0" class="text-center py-8 text-gray-500">
+                  Aucune facture récente
                 </div>
               </div>
             </div>
+          </div>
 
-            <!-- Preferences Tab -->
-            <div v-if="activeTab === 'preferences'" class="p-6">
-              <h2 class="text-xl font-semibold text-gray-900 mb-6">Préférences</h2>
+          <!-- Password Tab -->
+          <div v-if="activeTab === 'password'" class="p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">Changer le mot de passe</h2>
 
-              <div class="space-y-6">
-                <div>
-                  <h3 class="text-lg font-medium text-gray-900 mb-4">Notifications</h3>
-                  <div class="space-y-3">
-                    <label class="flex items-center">
-                      <input v-model="preferences.emailNotifications" type="checkbox"
-                        class="rounded border-gray-300 text-orange-600 focus:ring-orange-500" />
-                      <span class="ml-3 text-gray-700">Recevoir les notifications par email</span>
-                    </label>
-                    <label class="flex items-center">
-                      <input v-model="preferences.promotionalEmails" type="checkbox"
-                        class="rounded border-gray-300 text-orange-600 focus:ring-orange-500" />
-                      <span class="ml-3 text-gray-700">Recevoir les offres promotionnelles</span>
-                    </label>
-                    <label class="flex items-center">
-                      <input v-model="preferences.orderUpdates" type="checkbox"
-                        class="rounded border-gray-300 text-orange-600 focus:ring-orange-500" />
-                      <span class="ml-3 text-gray-700">Notifications de suivi de commande</span>
-                    </label>
+            <form @submit="handlePasswordSubmit" class="space-y-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Mot de passe actuel</label>
+                <input v-model="passwordForm.data.currentPassword" type="password"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  :class="{ 'border-red-500': passwordForm.errors.value.currentPassword }" />
+                <p v-if="passwordForm.errors.value.currentPassword" class="text-red-500 text-sm mt-1">
+                  {{ passwordForm.errors.value.currentPassword }}
+                </p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Nouveau mot de passe</label>
+                <input v-model="passwordForm.data.newPassword" type="password"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  :class="{ 'border-red-500': passwordForm.errors.value.newPassword }" />
+                <p v-if="passwordForm.errors.value.newPassword" class="text-red-500 text-sm mt-1">
+                  {{ passwordForm.errors.value.newPassword }}
+                </p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Confirmer le nouveau mot de passe</label>
+                <input v-model="passwordForm.data.confirmPassword" type="password"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  :class="{ 'border-red-500': passwordForm.errors.value.confirmPassword }" />
+                <p v-if="passwordForm.errors.value.confirmPassword" class="text-red-500 text-sm mt-1">
+                  {{ passwordForm.errors.value.confirmPassword }}
+                </p>
+              </div>
+
+              <div class="flex justify-end">
+                <button type="submit" :disabled="passwordForm.isLoading.value"
+                  class="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition-all disabled:opacity-50">
+                  {{ passwordForm.isLoading ? 'Modification...' : 'Modifier le mot de passe' }}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Orders Tab -->
+          <div v-if="activeTab === 'orders'" class="p-6">
+            <div class="flex justify-between items-center mb-6">
+              <h2 class="text-xl font-semibold text-gray-900">Mes commandes</h2>
+              <router-link to="/orders" class="text-orange-600 hover:text-orange-700 font-medium">
+                Voir toutes les commandes →
+              </router-link>
+            </div>
+
+            <div class="space-y-4">
+              <div v-for="order in recentOrders" :key="order.id"
+                class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div class="flex justify-between items-start mb-2">
+                  <div>
+                    <h3 class="font-medium text-gray-900">Commande #{{ order.id }}</h3>
+                    <p class="text-sm text-gray-600">{{ formatDate(new Date(order.createdAt)) }}</p>
+                  </div>
+                  <span :class="[
+                    'px-3 py-1 rounded-full text-xs font-medium',
+                    order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                      order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
+                        order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-gray-100 text-gray-800'
+                  ]">
+                    {{ getStatusLabel(order.status) }}
+                  </span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <p class="text-sm text-gray-600">1 article</p>
+                  <p class="font-semibold text-gray-900">{{ formatCurrency(order.total) }}</p>
+                </div>
+              </div>
+
+              <div v-if="recentOrders.length === 0" class="text-center py-8 text-gray-500">
+                Aucune commande récente
+              </div>
+            </div>
+          </div>
+
+          <!-- Preferences Tab -->
+          <div v-if="activeTab === 'preferences'" class="p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-900 mb-6">Préférences</h2>
+
+            <div class="space-y-6">
+              <div>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Notifications</h3>
+                <div class="space-y-3">
+                  <label class="flex items-center">
+                    <input v-model="preferences.emailNotifications" type="checkbox"
+                      class="rounded border-gray-300 text-orange-600 focus:ring-orange-500" />
+                    <span class="ml-3 text-gray-700">Recevoir les notifications par email</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input v-model="preferences.promotionalEmails" type="checkbox"
+                      class="rounded border-gray-300 text-orange-600 focus:ring-orange-500" />
+                    <span class="ml-3 text-gray-700">Recevoir les offres promotionnelles</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input v-model="preferences.orderUpdates" type="checkbox"
+                      class="rounded border-gray-300 text-orange-600 focus:ring-orange-500" />
+                    <span class="ml-3 text-gray-700">Notifications de suivi de commande</span>
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Langue et région</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Langue</label>
+                    <select v-model="preferences.language"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                      <option value="fr">Français</option>
+                      <option value="en">English</option>
+                      <option value="es">Español</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Devise</label>
+                    <select v-model="preferences.currency"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                      <option value="EUR">Euro (€)</option>
+                      <option value="USD">Dollar ($)</option>
+                      <option value="GBP">Livre (£)</option>
+                    </select>
                   </div>
                 </div>
+              </div>
 
-                <div>
-                  <h3 class="text-lg font-medium text-gray-900 mb-4">Langue et région</h3>
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-2">Langue</label>
-                      <select v-model="preferences.language"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
-                        <option value="fr">Français</option>
-                        <option value="en">English</option>
-                        <option value="es">Español</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-2">Devise</label>
-                      <select v-model="preferences.currency"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
-                        <option value="EUR">Euro (€)</option>
-                        <option value="USD">Dollar ($)</option>
-                        <option value="GBP">Livre (£)</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="flex justify-end">
-                  <button @click="savePreferences" :disabled="isLoadingPreferences"
-                    class="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition-all disabled:opacity-50">
-                    {{ isLoadingPreferences ? 'Enregistrement...' : 'Enregistrer les préférences' }}
-                  </button>
-                </div>
+              <div class="flex justify-end">
+                <button @click="savePreferences" :disabled="isLoadingPreferences"
+                  class="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 transition-all disabled:opacity-50">
+                  {{ isLoadingPreferences ? 'Enregistrement...' : 'Enregistrer les préférences' }}
+                </button>
               </div>
             </div>
           </div>
@@ -271,13 +310,36 @@ import { z } from 'zod'
 const authStore = useAuthStore()
 const toast = useToast()
 
-const activeTab = ref('personal')
+const activeTab = ref<'personal' | 'password' | 'orders' | 'invoices' | 'preferences'>('personal')
+// Statut facture (pour la section factures)
+const getStatusClass = (status: string) => {
+  const classes = {
+    draft: 'bg-gray-100 text-gray-800',
+    sent: 'bg-blue-100 text-blue-800',
+    paid: 'bg-green-100 text-green-800',
+    overdue: 'bg-red-100 text-red-800',
+    cancelled: 'bg-red-100 text-red-800'
+  }
+  return classes[status as keyof typeof classes] || 'bg-gray-100 text-gray-800'
+}
+
+const getStatusText = (status: string) => {
+  const texts = {
+    draft: 'Brouillon',
+    sent: 'Envoyée',
+    paid: 'Payée',
+    overdue: 'En retard',
+    cancelled: 'Annulée'
+  }
+  return texts[status as keyof typeof texts] || status
+}
 const isLoadingPreferences = ref(false)
 
 const tabs = [
   { id: 'personal', label: 'Informations personnelles', icon: '👤' },
   { id: 'password', label: 'Mot de passe', icon: '🔒' },
   { id: 'orders', label: 'Mes commandes', icon: '📦' },
+  { id: 'invoices', label: 'Mes factures', icon: '🧾' },
   { id: 'preferences', label: 'Préférences', icon: '⚙️' }
 ]
 
@@ -352,7 +414,7 @@ onMounted(async () => {
       personalForm.data.phone = result.data.phone || ''
       personalForm.data.birthDate = result.data.birthDate ? result.data.birthDate.slice(0, 10) : ''
     }
-  } catch (e) {}
+  } catch (e) { }
 })
 
 // Password Form
@@ -399,7 +461,7 @@ const passwordForm = useForm({
 })
 
 // Recent Orders (chargées depuis l'API)
-import type { Order } from '@/stores/orders'
+import type { Order, Invoice } from '@/stores/orders'
 const recentOrders = ref<Order[]>([])
 const loadOrders = async () => {
   try {
@@ -416,8 +478,27 @@ const loadOrders = async () => {
     recentOrders.value = []
   }
 }
+const recentInvoices = ref<Invoice[]>([])
+
+const loadInvoices = async () => {
+  try {
+    const res = await fetch('/api/invoices', {
+      headers: { 'Authorization': `Bearer ${authStore.token}` }
+    })
+    const result = await res.json()
+    if (result.success && Array.isArray(result.data?.invoices)) {
+      recentInvoices.value = result.data.invoices as Invoice[]
+    } else {
+      recentInvoices.value = []
+    }
+  } catch (e) {
+    recentInvoices.value = []
+  }
+}
+
 onMounted(() => {
   loadOrders()
+  loadInvoices()
 })
 
 // Preferences
