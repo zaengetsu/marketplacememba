@@ -1,6 +1,9 @@
-# 🛒 E-Commerce Platform - Vue.js & Node.js
 
-Une plateforme e-commerce complète avec architecture hybride PostgreSQL + MongoDB, système de rôles avancé, conformité RGPD, et gestion complète du paiement et de la facturation.
+# 🛒 MambaFit E-Commerce Platform
+
+Plateforme e-commerce moderne, rapide et sécurisée, développée avec Vue.js 3, Node.js, PostgreSQL et MongoDB. Toutes les fonctionnalités essentielles sont en place : panier robuste, favoris, gestion d’images, paiement Stripe, facturation PDF, conformité RGPD, et dashboard admin avancé.
+
+> **Statut :** Toutes les fonctionnalités principales sont terminées. **Il ne manque que la partie recherche et filtres avancés via MongoDB.**
 
 ---
 
@@ -11,21 +14,24 @@ Une plateforme e-commerce complète avec architecture hybride PostgreSQL + Mongo
 
 ---
 
+
 ## 🚀 Fonctionnalités principales
 
 ### ✨ Frontend (Vue.js 3 + TypeScript)
 - **Interface moderne** avec TailwindCSS
 - **Gestion d'état** avec Pinia
-- **Système de panier** avec réservation temporaire (15 min)
-- **Recherche et filtres** avancés
+- **Système de panier** robuste (réservation temporaire, suppression sécurisée, synchronisation locale)
+- **Système de favoris** performant
+- **Gestion universelle des images produits** (tous formats, fallback, SVG, etc.)
 - **Dashboard admin** avec gestion des rôles
 - **Modale de détail produit** interactive
 - **Conformité RGPD** avec gestion des cookies
 - **Affichage des factures** et téléchargement PDF
 - **Page de confirmation de commande** après paiement
+- **Sécurité renforcée** (vérification des IDs, gestion des erreurs)
 
 ### 🔧 Backend (Node.js + Express)
-- **Architecture hybride** : PostgreSQL (données principales) + MongoDB (recherche)
+- **Architecture hybride** : PostgreSQL (données principales) + MongoDB (recherche avancée à venir)
 - **Synchronisation automatique** PostgreSQL ↔ MongoDB
 - **Système de rôles** : Admin, Store Keeper, Compta, User
 - **API RESTful** complète avec validation
@@ -35,6 +41,16 @@ Une plateforme e-commerce complète avec architecture hybride PostgreSQL + Mongo
 - **Génération automatique de factures PDF** après paiement
 - **Envoi automatique de la facture par email** au client
 - **Logs structurés** avec Winston
+
+---
+
+## 🗺️ Roadmap & Points Restants
+
+- [x] Panier, favoris, paiement, facturation, images, sécurité, dashboard admin : **OK**
+- [ ] **Recherche et filtres avancés via MongoDB** : _à finaliser_
+  - Recherche full-text, filtres dynamiques, analytics produits
+
+---
 
 ### 🗄️ Base de données
 - **PostgreSQL** : Utilisateurs, Produits, Commandes, Factures
