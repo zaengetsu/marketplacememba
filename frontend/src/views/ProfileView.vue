@@ -172,7 +172,7 @@
                   <div class="flex justify-between items-start mb-2">
                     <div>
                       <h3 class="font-medium text-gray-900">Commande #{{ order.id }}</h3>
-                      <p class="text-sm text-gray-600">{{ formatDate(order.createdAt) }}</p>
+                      <p class="text-sm text-gray-600">{{ formatDate(new Date(order.createdAt)) }}</p>
                     </div>
                     <span :class="[
                       'px-3 py-1 rounded-full text-xs font-medium',
@@ -185,7 +185,7 @@
                     </span>
                   </div>
                   <div class="flex justify-between items-center">
-                    <p class="text-sm text-gray-600">{{ order.itemsCount }} article(s)</p>
+                    <p class="text-sm text-gray-600">1 article</p>
                     <p class="font-semibold text-gray-900">{{ formatCurrency(order.total) }}</p>
                   </div>
                 </div>
@@ -399,15 +399,16 @@ const passwordForm = useForm({
 })
 
 // Recent Orders (chargées depuis l'API)
-const recentOrders = ref([])
+import type { Order } from '@/stores/orders'
+const recentOrders = ref<Order[]>([])
 const loadOrders = async () => {
   try {
     const res = await fetch('/api/orders', {
       headers: { 'Authorization': `Bearer ${authStore.token}` }
     })
     const result = await res.json()
-    if (result.success && Array.isArray(result.data)) {
-      recentOrders.value = result.data.slice(0, 3)
+    if (result.success && Array.isArray(result.data?.orders)) {
+      recentOrders.value = result.data.orders.slice(0, 3) as Order[]
     } else {
       recentOrders.value = []
     }
