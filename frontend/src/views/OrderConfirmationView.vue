@@ -33,12 +33,15 @@
                 </span>
               </div>
               <div>
-                <h3 class="font-medium mb-2">Total</h3>
-                <p class="text-xl font-semibold">{{ parseFloat(order.total.toString()).toFixed(2) }}€</p>
+                <h3 class="font-medium mb-2">Total payé</h3>
+                <p class="text-xl font-semibold">
+                  {{ (Number(order.total) + Number(order.shippingCost || 0)).toFixed(2) }}€
+                </p>
                 <div class="text-sm mt-2">
                   <div>Sous-total HT : <span class="font-semibold">{{ totalHT(order).toFixed(2) }}€</span></div>
                   <div>TVA (20%) : <span class="font-semibold">{{ tva(order).toFixed(2) }}€</span></div>
-                  <div>Total TTC : <span class="font-semibold">{{ parseFloat(order.total.toString()).toFixed(2) }}€</span></div>
+                  <div v-if="order.shippingCost && order.shippingCost > 0">Livraison : <span class="font-semibold">{{ Number(order.shippingCost).toFixed(2) }}€</span></div>
+                  <div>Total TTC : <span class="font-semibold">{{ (Number(order.total) + Number(order.shippingCost || 0)).toFixed(2) }}€</span></div>
                 </div>
               </div>
               <div>

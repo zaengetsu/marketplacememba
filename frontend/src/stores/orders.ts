@@ -11,6 +11,7 @@ export interface Order {
   billingAddress: any
   createdAt: string
   updatedAt: string
+  shippingCost?: number
 }
 
 export interface Invoice {
