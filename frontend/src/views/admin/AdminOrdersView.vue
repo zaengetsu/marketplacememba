@@ -41,7 +41,7 @@
           <td class="py-2 px-4 border-b">
             <select 
               :value="order.status" 
-              @change="updateOrderStatus(order, $event.target.value)"
+              @change="onOrderStatusChange(order, $event)"
               class="form-select text-sm mr-2"
             >
               <option value="pending">En attente</option>
@@ -115,6 +115,12 @@ const formatDate = (date: string) => {
   return new Date(date).toLocaleString('fr-FR')
 }
 
+const onOrderStatusChange = (order: any, event: Event) => {
+  const target = event.target as HTMLSelectElement | null
+  if (!target) return
+  updateOrderStatus(order, target.value)
+}
+
 const updateOrderStatus = async (order: any, newStatus: string) => {
   try {
     const response = await apiClient.put(`/orders/${order.id}/status`, {
@@ -125,6 +131,7 @@ const updateOrderStatus = async (order: any, newStatus: string) => {
       // Mise à jour locale
       order.status = newStatus
       toast.success('Statut de la commande mis à jour avec succès')
+      // TODO: Envoyer un mail au client pour l'informer du changement de statut
     } else {
       throw new Error(response.data.message || 'Erreur lors de la mise à jour')
     }
