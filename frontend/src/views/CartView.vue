@@ -318,7 +318,8 @@ const proceedToCheckout = async () => {
       body: JSON.stringify({
         orderId: order.id,
         paymentIntentId: paymentIntent.id,
-        email: authStore.user?.email
+        email: authStore.user?.email,
+        shippingCost: shippingCost.value
       })
     })
     

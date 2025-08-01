@@ -1,8 +1,39 @@
+// ...existing code...
 require('dotenv').config();
 const transporter = require('../utils/mailer');
 const logger = require('../utils/logger');
 
 class EmailService {
+  async sendInvoiceEmail(email, invoice, order, pdfPath) {
+    if (!this.isEnabled) return;
+
+    const mailOptions = {
+      from: process.env.MAIL_FROM,
+      to: email,
+      subject: `Votre facture pour la commande #${order.id}`,
+      html: `
+        <p>Bonjour ${order.user?.firstName || ''},</p>
+        <p>Merci pour votre commande <strong>#${order.id}</strong>.</p>
+        <p>Vous trouverez en pièce jointe la facture au format PDF.</p>
+        <p>Si vous avez des questions, n'hésitez pas à nous contacter.</p>
+        <p>Merci de votre confiance !</p>
+      `,
+      attachments: [
+        {
+          filename: `facture-${invoice.id}.pdf`,
+          path: pdfPath,
+          contentType: 'application/pdf'
+        }
+      ]
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+      logger.info(`📧 Facture PDF envoyée à ${email} pour la commande ${order.id}`);
+    } catch (error) {
+      logger.error("❌ Erreur lors de l'envoi de la facture PDF :", error);
+    }
+  }
   constructor() {
     this.isEnabled = !!(process.env.MAIL_USER && process.env.MAIL_PASSWORD);
 

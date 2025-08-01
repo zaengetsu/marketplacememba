@@ -76,7 +76,7 @@ export const useOrderStore = defineStore('orders', () => {
     isLoading.value = true
     try {
       const response = await api.payments.createIntent({
-        amount,
+        amount: Math.round(amount * 100), // Montant en centimes
         currency: 'eur',
         orderId
       })
@@ -174,30 +174,32 @@ export const useOrderStore = defineStore('orders', () => {
     }
   }
 
-  const processCheckout = async (cartItems: any[], shippingAddress: any, billingAddress?: any) => {
-  try {
-    // 1. Calculer le total (utilise item.price déjà préparé)
-    const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  const processCheckout = async (cartItems: any[], shippingAddress: any, billingAddress?: any, shippingCost?: number) => {
+    try {
+      // 1. Calculer le total TTC des produits
+      const totalTTC = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+      // Ajoute le coût de livraison
+      const totalToPay = shippingCost !== undefined ? totalTTC + shippingCost : totalTTC
 
-    // 2. Créer la commande
-    const order = await createOrder({
-      total,
-      shippingAddress,
-      billingAddress: billingAddress || shippingAddress,
-      items: cartItems
-    })
+      // 2. Créer la commande
+      const order = await createOrder({
+        total: totalToPay,
+        shippingAddress,
+        billingAddress: billingAddress || shippingAddress,
+        items: cartItems
+      })
 
-    // 3. Créer l'intention de paiement
-    const paymentIntent = await createPaymentIntent(total, order.id)
+      // 3. Créer l'intention de paiement
+      const paymentIntent = await createPaymentIntent(totalToPay, order.id)
 
-    return {
-      order,
-      paymentIntent
+      return {
+        order,
+        paymentIntent
+      }
+    } catch (error) {
+      throw error
     }
-  } catch (error) {
-    throw error
   }
-}
 
   const clearCurrentOrder = () => {
     currentOrder.value = null

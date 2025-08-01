@@ -11,6 +11,7 @@ const generateInvoicePDF = require('../utils/invoicePDF')
 router.post('/create-intent', authenticate, async (req, res) => {
   try {
     const { amount, currency = 'eur', orderId } = req.body;
+    logger.info(`[DEBUG] /create-intent montant reçu:`, { amount, currency, orderId });
 
     if (!amount || amount <= 0) {
       return res.status(400).json({
@@ -33,56 +34,24 @@ router.post('/create-intent', authenticate, async (req, res) => {
       client_secret: 'pi_simulation_secret_' + Date.now(),
       amount: Math.round(amount * 100),
       currency,
-      status: 'requires_payment_method'
+      status: 'succeeded' // ← Simule un paiement réussi
     };
 
     logger.info('Payment intent created', {
       paymentIntentId: paymentIntent.id,
       userId: req.user.id,
-      amount,
-      orderId
     });
 
-    res.json({
-      success: true,
-      data: {
-        clientSecret: paymentIntent.client_secret,
-        paymentIntentId: paymentIntent.id
-      }
-    });
-
-  } catch (error) {
-    logger.error('Error creating payment intent:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Erreur lors de la création du paiement'
-    });
-  }
-});
-
-// POST /api/payments/confirm - Confirmer un paiement
-router.post('/confirm', authenticate, async (req, res) => {
-  try {
-    const { paymentIntentId, orderId } = req.body;
-
-    if (!paymentIntentId) {
-      return res.status(400).json({
-        success: false,
-        message: 'ID de paiement requis'
-      });
-    }
-
-
-    // Appel réel à Stripe pour récupérer le PaymentIntent
-    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-
+    // Simule la confirmation de paiement
     if (paymentIntent.status === 'succeeded') {
       if (orderId) {
         const { Order, OrderItem, Product, Invoice, User } = require('../../models');
         const emailService = require('../services/emailService');
         const { generateInvoicePdf } = require('../services/invoicePdfService');
         const order = await Order.findByPk(orderId, {
-          include: [{ model: OrderItem, as: 'orderItems', include: [{ model: Product, as: 'Product' }] }]
+          include: [
+            { model: OrderItem, as: 'orderItems', include: [{ model: Product, as: 'Product' }] }
+          ]
         });
 
         if (order) {
@@ -107,21 +76,26 @@ router.post('/confirm', authenticate, async (req, res) => {
             };
           });
 
-          // Création de la facture
-          const invoiceNumber = `INV-${Date.now()}-${orderId}`;
-          const invoice = await Invoice.create({
-            orderId: order.id,
-            userId: order.userId,
-            invoiceNumber,
-            amount: totalTTC,
-            totalHT: totalHT,
-            tva: totalTVA,
-            totalTTC: totalTTC,
-            status: 'sent',
-            issuedAt: new Date(),
-            dueAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-            paidAt: new Date()
-          });
+          // Création ou récupération de la facture
+          let invoice = await Invoice.findOne({ where: { orderId: order.id } });
+          if (!invoice) {
+            const invoiceNumber = `INV-${Date.now()}-${orderId}`;
+            invoice = await Invoice.create({
+              orderId: order.id,
+              userId: order.userId,
+              invoiceNumber,
+              amount: totalTTC,
+              totalHT: totalHT,
+              tva: totalTVA,
+              totalTTC: totalTTC,
+              status: 'paid',
+              issuedAt: new Date(),
+              dueAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+              paidAt: new Date()
+            });
+          } else {
+            await invoice.update({ status: 'paid', paidAt: new Date() });
+          }
 
           // Génère le PDF de la facture
           const user = await User.findByPk(order.userId);
@@ -134,23 +108,13 @@ router.post('/confirm', authenticate, async (req, res) => {
 
           // Envoie l'email de confirmation avec la facture en pièce jointe
           if (user && emailService.isEnabled) {
-            await emailService.transporter.sendMail({
-              from: process.env.MAIL_FROM,
-              to: user.email,
-              subject: `Votre facture pour la commande #${order.id}`,
-              text: `Bonjour ${user.firstName},\n\nMerci pour votre commande. Vous trouverez votre facture en pièce jointe.`,
-              attachments: [
-                {
-                  filename: `facture-${invoice.id}.pdf`,
-                  path: pdfPath
-                }
-              ]
-            });
+            await emailService.sendInvoiceEmail(user.email, invoice, orderForPdf, pdfPath);
+            logger.info(`Facture PDF envoyée à ${user.email} pour la commande ${order.id}`);
           }
 
           logger.info('Invoice auto-created after payment', {
             orderId: order.id,
-            invoiceNumber,
+            invoiceNumber: invoice.invoiceNumber,
             totalHT,
             totalTVA,
             totalTTC
@@ -159,7 +123,7 @@ router.post('/confirm', authenticate, async (req, res) => {
       }
 
       logger.info('Payment confirmed', {
-        paymentIntentId,
+        paymentIntentId: paymentIntent.id,
         userId: req.user.id,
         orderId
       });
@@ -168,7 +132,7 @@ router.post('/confirm', authenticate, async (req, res) => {
         success: true,
         message: 'Paiement confirmé avec succès',
         data: {
-          paymentIntentId,
+          paymentIntentId: paymentIntent.id,
           status: paymentIntent.status,
           amount: paymentIntent.amount / 100
         }
@@ -180,7 +144,6 @@ router.post('/confirm', authenticate, async (req, res) => {
         status: paymentIntent.status
       });
     }
-
   } catch (error) {
     logger.error('Error confirming payment:', error);
     res.status(500).json({
@@ -268,7 +231,7 @@ router.post('/create-checkout-session', authenticate, async (req, res) => {
     }
 
     // Production: utiliser Stripe réel
-    const line_items = order.orderItems.map(item => ({
+    let line_items = order.orderItems.map(item => ({
       price_data: {
         currency: 'eur',
         product_data: { name: item.Product.name },
@@ -276,6 +239,20 @@ router.post('/create-checkout-session', authenticate, async (req, res) => {
       },
       quantity: item.quantity,
     }));
+
+    // Ajoute la livraison comme item si le coût est > 0
+    // Le coût de livraison doit être transmis depuis le frontend
+    const shippingCost = req.body.shippingCost !== undefined ? Number(req.body.shippingCost) : 0;
+    if (shippingCost > 0) {
+      line_items.push({
+        price_data: {
+          currency: 'eur',
+          product_data: { name: 'Livraison' },
+          unit_amount: Math.round(shippingCost * 100),
+        },
+        quantity: 1,
+      });
+    }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],

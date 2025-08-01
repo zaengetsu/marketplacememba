@@ -63,9 +63,12 @@ async function generateInvoicePdf(invoice, order, options = {}) {
     doc.moveDown();
 
     // Totaux
-    doc.fontSize(12).text(`Total HT : ${invoice.totalHT?.toFixed(2) || ''} €`, { align: 'right' });
-    doc.text(`TVA : ${invoice.tva?.toFixed(2) || ''} €`, { align: 'right' });
-    doc.text(`Total TTC : ${invoice.totalTTC?.toFixed(2) || ''} €`, { align: 'right' });
+    const totalHT = typeof invoice.totalHT === 'number' ? invoice.totalHT : parseFloat(invoice.totalHT) || 0;
+    const tva = typeof invoice.tva === 'number' ? invoice.tva : parseFloat(invoice.tva) || 0;
+    const totalTTC = typeof invoice.totalTTC === 'number' ? invoice.totalTTC : parseFloat(invoice.totalTTC) || 0;
+    doc.fontSize(12).text(`Total HT : ${totalHT.toFixed(2)} €`, { align: 'right' });
+    doc.text(`TVA : ${tva.toFixed(2)} €`, { align: 'right' });
+    doc.text(`Total TTC : ${totalTTC.toFixed(2)} €`, { align: 'right' });
     doc.moveDown();
 
     // Footer
