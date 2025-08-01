@@ -96,7 +96,9 @@
                   </div>
 
                   <!-- Supprimer -->
-                  <button @click="cartStore.removeItem(item.product.id.toString())"
+                  <button
+                    v-if="item.product && item.product.id !== undefined && item.product.id !== null"
+                    @click="cartStore.removeItem(item.product.id.toString())"
                     class="text-red-500 hover:text-red-700 p-2">
                     🗑️
                   </button>

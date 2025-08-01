@@ -270,8 +270,8 @@ const getStatusText = (status: string) => {
   return texts[status as keyof typeof texts] || status
 }
 
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('fr-FR', {
+const formatDate = (date: Date) => {
+  return date.toLocaleDateString('fr-FR', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
