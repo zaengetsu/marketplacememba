@@ -159,14 +159,24 @@ router.get('/search-mongo', async (req, res) => {
     } = req.query;
 
     const filter = { isActive: true };
+    
+    // Filtres Catégories
     if (category) filter['category.id'] = category;
+    
+    // Filtres Promotions
     if (onSale === 'true') filter.isOnSale = true;
+    
+    // Filtres Stock
     if (inStock === 'true') filter.stockQuantity = { $gt: 0 };
+    
+    // Filtres Prix
     if (minPrice || maxPrice) {
       filter.price = {};
-      if (minPrice) filter.price.$gte = parseFloat(minPrice);
-      if (maxPrice) filter.price.$lte = parseFloat(maxPrice);
+      if (minPrice) filter.price.$gte = Number(minPrice);
+      if (maxPrice) filter.price.$lte = Number(maxPrice);
     }
+
+    // Recherche textuelle
     if (search) {
       filter.$or = [
         { name: { $regex: search, $options: 'i' } },

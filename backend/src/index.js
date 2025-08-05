@@ -13,9 +13,13 @@ require('dotenv').config();
 
 console.log('🔄 Chargement des modules...');
 
+
 const connectDB = require('./database/connection');
 const logger = require('./utils/logger');
 const errorHandler = require('./middlewares/errorHandler');
+
+// === Synchronisation SQL → MongoDB ===
+const autoSyncService = require('./services/autoSyncService');
 
 console.log('✅ Modules chargés, début de l\'initialisation...');
 
@@ -24,8 +28,16 @@ const app = express();
 console.log('🚀 Application Express créée');
 
 // Connexion à la base de données AVANT d'importer les routes
+
 console.log('🔄 Connexion à la base de données...');
 connectDB();
+
+// Initialiser la synchronisation automatique après la connexion DB
+autoSyncService.initialize().then(() => {
+  logger.info('🔄 Synchronisation SQL → MongoDB initialisée');
+}).catch((err) => {
+  logger.error('❌ Erreur lors de l\'initialisation de la synchronisation SQL → MongoDB:', err);
+});
 
 // Import des routes APRÈS la connexion DB
 console.log('🔄 Import des routes...');

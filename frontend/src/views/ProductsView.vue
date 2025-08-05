@@ -197,7 +197,8 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useCartStore } from '../stores/cart'
-import { productService, categoryService } from '../services/api'
+import { categoryService } from '../services/api'
+import axios from 'axios'
 import type { Product, Category } from '../types/product'
 import ProductModal from '../components/ProductModal.vue'
 import { useToast } from 'vue-toastification'
@@ -274,20 +275,20 @@ const loadProducts = async () => {
     if (onlyOnSale.value) params.onSale = true
     if (onlyInStock.value) params.inStock = true
 
-    const response = await productService.getProducts(params)
+    // Appel direct à la route Mongo
+    const response = await axios.get(`${import.meta.env.VITE_API_URL}/products/search-mongo`, { params })
 
-    if (response.success && response.data) {
-      // On force price et salePrice à être des nombres pour chaque produit
-      products.value = (response.data.products || []).map((prod: any) => {
+    if (response.data.success && response.data.data) {
+      products.value = (response.data.data.products || []).map((prod: any) => {
         return {
           ...prod,
           price: Number(prod.price) || 0,
           salePrice: prod.salePrice !== undefined ? Number(prod.salePrice) : undefined
         }
       })
-      if (response.data.pagination) {
-        totalProducts.value = response.data.pagination.total
-        totalPages.value = response.data.pagination.pages
+      if (response.data.data.pagination) {
+        totalProducts.value = response.data.data.pagination.total
+        totalPages.value = response.data.data.pagination.pages
       }
     }
   } catch (error) {
