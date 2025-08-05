@@ -1,4 +1,6 @@
 const { Sequelize } = require('sequelize');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 const logger = require('../utils/logger');
 
 // Configuration de la base de données
@@ -51,6 +53,21 @@ const connectDB = async () => {
   } catch (error) {
     logger.error('Error connecting to PostgreSQL:', error);
     process.exit(1);
+  }
+
+  // Connexion à MongoDB
+  try {
+    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/marketplace';
+    if (!mongoUri) {
+      logger.warn('No MONGODB_URI provided in .env file');
+      return;
+    }
+    await mongoose.connect(mongoUri, {
+      // useNewUrlParser et useUnifiedTopology sont dépréciés, mais laissés pour compatibilité
+    });
+    logger.info(`MongoDB Connected: ${mongoUri}`);
+  } catch (error) {
+    logger.error('Error connecting to MongoDB:', error);
   }
 };
 
