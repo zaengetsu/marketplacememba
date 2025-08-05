@@ -30,7 +30,7 @@
                 <label class="form-label">Catégorie</label>
                 <select v-model="selectedCategory" class="form-select" @change="loadProducts">
                   <option value="">Toutes les catégories</option>
-                  <option v-for="category in categories" :key="category.id" :value="category.id">
+                  <option v-for="category in uniqueCategories" :key="category.id" :value="category.id">
                     {{ category.name }}
                   </option>
                 </select>
@@ -212,6 +212,15 @@ const products = ref<Product[]>([])
 const categories = ref<Category[]>([])
 const loading = ref(true)
 const selectedProduct = ref<Product | null>(null)
+const uniqueCategories = computed(() => {
+  const seen = new Set<string>()
+  return categories.value.filter(cat => {
+    const key = cat.name.trim().toLowerCase()
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+})
 
 // Filtres
 const searchQuery = ref('')

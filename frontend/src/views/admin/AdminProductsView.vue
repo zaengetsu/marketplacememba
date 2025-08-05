@@ -22,7 +22,7 @@
             <div>
               <select v-model="selectedCategory" class="form-select">
                 <option value="">Toutes les catégories</option>
-                <option v-for="category in categories" :key="category.id" :value="category.id">
+                <option v-for="category in filteredCategories" :key="category.id" :value="category.id">
                   {{ category.name }}
                 </option>
               </select>
@@ -199,7 +199,7 @@ const toast = useToast()
 
 // État
 const products = ref<ProductDisplay[]>([])
-const categories = ref<{ id: number | string, name: string }[]>([])
+const categories = ref<{ id: number | string, name: string, isActive?: boolean }[]>([])
 const loading = ref(true)
 const selectedProduct = ref<ProductDisplay | null>(null)
 const productToDelete = ref<ProductDisplay | null>(null)
@@ -208,6 +208,13 @@ const productToDelete = ref<ProductDisplay | null>(null)
 const searchQuery = ref('')
 const selectedCategory = ref('')
 const selectedStatus = ref('')
+const filteredCategories = computed(() => {
+  const usedCategoryIds = new Set(products.value.map(p => String(p.category.id)))
+  return categories.value.filter(cat => {
+    const isActive = cat.isActive !== false // true si undefined ou true
+    return isActive && usedCategoryIds.has(String(cat.id))
+  })
+})
 
 // Pagination
 const currentPage = ref(1)
@@ -389,9 +396,9 @@ const confirmDelete = async () => {
     if (!productId) {
       throw new Error('ID du produit manquant')
     }
-    
     await productService.deleteProduct(productId)
-    await loadProducts() // Recharge la liste après suppression
+    await loadProducts() // Recharge la liste des produits
+    await loadCategories() // Recharge la liste des catégories pour éviter les catégories orphelines
     toast.success('Produit supprimé avec succès')
     productToDelete.value = null
   } catch (error) {

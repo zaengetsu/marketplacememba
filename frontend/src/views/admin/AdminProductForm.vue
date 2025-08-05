@@ -49,7 +49,7 @@
                   <select v-model="data.categoryId" class="form-select"
                     :class="{ 'border-red-500': errors.categoryId }">
                     <option value="">Sélectionner une catégorie</option>
-                    <option v-for="category in categories" :key="category.id" :value="String(category.id)">
+                    <option v-for="category in uniqueCategories" :key="category.id" :value="String(category.id)">
                       {{ category.name }}
                     </option>
                   </select>
@@ -114,7 +114,6 @@
               </div>
             </div>
 
-            <!-- Images -->
             <!-- Images -->
             <div class="card">
               <div class="card-header">
@@ -254,6 +253,7 @@ import { z } from 'zod'
 import { productService } from '@/services/api'
 import { categoryService } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
+import { cp } from 'fs'
 
 
 const route = useRoute()
@@ -267,6 +267,15 @@ const imageFiles = ref<Array<{ file: File, preview: string }>>([])
 
 // Catégories
 const categories = ref<{ id: number | string, name: string }[]>([])
+const uniqueCategories  = computed(() => {
+  const seen = new Set<string>()
+  return categories.value.filter(cat => {
+    const key = cat.name.trim().toLowerCase()
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+})
 
 // Schéma de validation
 const productSchema = z.object({
@@ -433,6 +442,7 @@ onMounted(async () => {
   const response = await categoryService.getCategories()
   if (response.success && response.data) {
     categories.value = response.data
+    // console.log('Catégories reçues:', response.data)
   }
 
   // Charger le produit en mode édition

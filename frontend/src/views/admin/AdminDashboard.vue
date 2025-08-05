@@ -123,6 +123,12 @@
                 <div class="text-2xl mb-2">📖</div>
                 <div class="text-sm font-medium">liste des utilisateurs</div>
               </router-link>
+
+              <router-link v-if="canAccess('analytics:read')" to="/admin/products"
+                class="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 text-center">
+                <div class="text-2xl mb-2">📦</div>
+                <div class="text-sm font-medium">Liste des produits</div>
+              </router-link>
             </div>
           </div>
         </div>
@@ -193,7 +199,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '../../stores/auth'
-import  apiClient from '@/services/api'
+import apiClient from '@/services/api'
 
 const authStore = useAuthStore()
 
