@@ -1,3 +1,5 @@
+// --- Recherche avancée MongoDB (ProductSearch) ---
+const ProductSearch = require('../models/ProductSearch');
 const express = require('express');
 const router = express.Router();
 const { Op } = require('sequelize');
@@ -136,6 +138,72 @@ router.get('/', async (req, res) => {
       success: false,
       message: 'Erreur lors de la récupération des produits'
     });
+  }
+});
+
+
+// GET /api/products/search-mongo - Recherche avancée MongoDB
+router.get('/search-mongo', async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 12,
+      category,
+      search,
+      minPrice,
+      maxPrice,
+      onSale,
+      inStock,
+      sortBy = 'name',
+      sortOrder = 'asc'
+    } = req.query;
+
+    const filter = { isActive: true };
+    if (category) filter['category.id'] = category;
+    if (onSale === 'true') filter.isOnSale = true;
+    if (inStock === 'true') filter.stockQuantity = { $gt: 0 };
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) filter.price.$gte = parseFloat(minPrice);
+      if (maxPrice) filter.price.$lte = parseFloat(maxPrice);
+    }
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    // Tri
+    const sort = {};
+    if (['price', 'name', 'createdAt'].includes(sortBy)) {
+      sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
+    } else {
+      sort.name = 1;
+    }
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const total = await ProductSearch.countDocuments(filter);
+    const products = await ProductSearch.find(filter)
+      .sort(sort)
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    res.json({
+      success: true,
+      data: {
+        products,
+        pagination: {
+          page: parseInt(page),
+          limit: parseInt(limit),
+          total,
+          pages: Math.ceil(total / limit)
+        }
+      }
+    });
+  } catch (error) {
+    logger.error('Mongo search error:', error);
+    res.status(500).json({ success: false, message: 'Erreur recherche Mongo' });
   }
 });
 
@@ -337,11 +405,11 @@ router.put('/:id', authenticate, requirePermission('products:write'), upload.arr
 
     // Gérer les nouvelles images uploadées
     let finalImages = product.images || [];
-    
+
     // Si de nouvelles images ont été uploadées
     if (req.files && req.files.length > 0) {
       const newImageUrls = req.files.map(file => `/uploads/products/${file.filename}`);
-      
+
       // Si images est fourni dans le body, on considère que c'est pour conserver certaines anciennes images
       if (images && Array.isArray(images)) {
         // Combiner les anciennes images conservées avec les nouvelles
@@ -542,5 +610,7 @@ router.get('/admin/all', authenticate, requirePermission('products:read'), async
     });
   }
 });
+
+
 
 module.exports = router; 

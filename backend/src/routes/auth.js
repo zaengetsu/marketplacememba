@@ -125,7 +125,8 @@ router.post('/register', registerLimiter, registerValidation, async (req, res) =
 // @desc    Connexion utilisateur
 // @route   POST /api/auth/login
 // @access  Public
-router.post('/login', authLimiter, [
+// router.post('/login', authLimiter, [
+router.post('/login', [
   body('email').isEmail().normalizeEmail().withMessage('Email invalide'),
   body('password').notEmpty().withMessage('Mot de passe requis')
 ], async (req, res) => {
