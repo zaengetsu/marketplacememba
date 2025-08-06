@@ -135,13 +135,14 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
-// Servir les fichiers statiques avec CORS explicite
+// Servir les fichiers statiques avec CORS explicite (chemin absolu)
+const path = require('path');
 app.use('/uploads', (req, res, next) => {
   res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
   res.header('Access-Control-Allow-Methods', 'GET');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   next();
-}, express.static('uploads'));
+}, express.static(path.join(__dirname, '../uploads')));
 
 // Rate limiting (plus permissif en développement)
 const limiter = rateLimit({

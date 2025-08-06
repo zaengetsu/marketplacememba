@@ -12,7 +12,9 @@
           <li>
             <div class="flex items-center">
               <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                <path fill-rule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clip-rule="evenodd"></path>
               </svg>
               <router-link to="/products" class="ml-1 text-gray-700 hover:text-blue-600 md:ml-2">
                 Produits
@@ -22,7 +24,9 @@
           <li>
             <div class="flex items-center">
               <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                <path fill-rule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clip-rule="evenodd"></path>
               </svg>
               <span class="ml-1 text-gray-500 md:ml-2">{{ product?.category?.name }}</span>
             </div>
@@ -30,7 +34,9 @@
           <li aria-current="page">
             <div class="flex items-center">
               <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                <path fill-rule="evenodd"
+                  d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                  clip-rule="evenodd"></path>
               </svg>
               <span class="ml-1 text-gray-500 md:ml-2">{{ product?.name }}</span>
             </div>
@@ -60,19 +66,18 @@
         <div>
           <!-- Image principale -->
           <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden mb-6 relative">
-            <img 
-              :src="getProductImage(product)" 
-              :alt="product.name"
-              class="w-full h-96 object-cover"
-            >
+            <img :src="getProductImage(product)" :alt="product.name" class="w-full h-96 object-cover">
             <!-- Badges -->
-            <div v-if="product.isOnSale" class="absolute top-4 left-4 bg-red-500 text-white px-3 py-2 rounded-full text-sm font-bold">
+            <div v-if="product.isOnSale"
+              class="absolute top-4 left-4 bg-red-500 text-white px-3 py-2 rounded-full text-sm font-bold">
               PROMOTION -{{ Math.round(((product.price - (product.salePrice || 0)) / product.price) * 100) }}%
             </div>
-            <div v-if="product.stockQuantity <= 5 && product.stockQuantity > 0" class="absolute top-4 right-4 bg-orange-500 text-white px-3 py-2 rounded-full text-sm">
+            <div v-if="product.stockQuantity <= 5 && product.stockQuantity > 0"
+              class="absolute top-4 right-4 bg-orange-500 text-white px-3 py-2 rounded-full text-sm">
               Stock faible
             </div>
-            <div v-if="product.stockQuantity === 0" class="absolute top-4 right-4 bg-red-500 text-white px-3 py-2 rounded-full text-sm">
+            <div v-if="product.stockQuantity === 0"
+              class="absolute top-4 right-4 bg-red-500 text-white px-3 py-2 rounded-full text-sm">
               Rupture de stock
             </div>
           </div>
@@ -85,15 +90,16 @@
           <!-- Titre et prix -->
           <div class="mb-6">
             <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ product.name }}</h1>
-            
+
             <!-- Prix -->
             <div class="flex flex-col items-start space-y-1 mb-4">
-              <span class="text-4xl font-bold" :class="product.isOnSale && product.salePrice ? 'text-red-500' : 'text-gray-900'">
+              <span class="text-4xl font-bold"
+                :class="product.isOnSale && product.salePrice ? 'text-red-500' : 'text-gray-900'">
                 {{
                   product && typeof product.price === 'number' && product.price > 0
                     ? (product.isOnSale && typeof product.salePrice === 'number' && product.salePrice > 0
-                        ? product.salePrice.toFixed(2)
-                        : product.price.toFixed(2))
+                      ? product.salePrice.toFixed(2)
+                      : product.price.toFixed(2))
                     : '--'
                 }}€ TTC
               </span>
@@ -101,16 +107,19 @@
                 HT : {{
                   product && typeof product.price === 'number' && product.price > 0
                     ? ((product.isOnSale && typeof product.salePrice === 'number' && product.salePrice > 0
-                        ? product.salePrice / 1.2
-                        : product.price / 1.2).toFixed(2))
+                      ? product.salePrice / 1.2
+                      : product.price / 1.2).toFixed(2))
                     : '--'
                 }}€
               </span>
-              <span v-if="product.isOnSale && typeof product.salePrice === 'number' && product.salePrice > 0" class="line-through text-gray-400 text-2xl">
+              <span v-if="product.isOnSale && typeof product.salePrice === 'number' && product.salePrice > 0"
+                class="line-through text-gray-400 text-2xl">
                 {{ product.price && typeof product.price === 'number' ? product.price.toFixed(2) : '--' }}€ TTC
               </span>
             </div>
-            <div v-if="product.isOnSale && typeof product.salePrice === 'number' && product.salePrice > 0 && typeof product.price === 'number' && product.price > 0" class="text-green-600 font-medium mb-4">
+            <div
+              v-if="product.isOnSale && typeof product.salePrice === 'number' && product.salePrice > 0 && typeof product.price === 'number' && product.price > 0"
+              class="text-green-600 font-medium mb-4">
               Vous économisez {{ (product.price - product.salePrice).toFixed(2) }}€
             </div>
           </div>
@@ -147,37 +156,24 @@
             <div class="flex items-center space-x-4 mb-6">
               <label class="text-lg font-medium text-gray-700">Quantité :</label>
               <div class="flex items-center border border-gray-300 rounded-lg">
-                <button 
-                  @click="quantity > 1 && quantity--"
-                  :disabled="quantity <= 1"
-                  class="px-4 py-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
+                <button @click="quantity > 1 && quantity--" :disabled="quantity <= 1"
+                  class="px-4 py-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
                   -
                 </button>
-                <input 
-                  v-model.number="quantity" 
-                  type="number" 
-                  min="1" 
-                  :max="product.stockQuantity"
-                  class="w-20 text-center border-0 focus:ring-0"
-                >
-                <button 
-                  @click="quantity < product.stockQuantity && quantity++"
+                <input v-model.number="quantity" type="number" min="1" :max="product.stockQuantity"
+                  class="w-20 text-center border-0 focus:ring-0">
+                <button @click="quantity < product.stockQuantity && quantity++"
                   :disabled="quantity >= product.stockQuantity"
-                  class="px-4 py-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
+                  class="px-4 py-2 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
                   +
                 </button>
               </div>
             </div>
 
             <div class="flex space-x-4">
-              <button 
-                @click="addToCart"
-                :disabled="!product.stockQuantity || isAdding"
+              <button @click="addToCart" :disabled="!product.stockQuantity || isAdding"
                 class="flex-1 btn btn-primary py-4 text-lg"
-                :class="{ 'opacity-50 cursor-not-allowed': !product.stockQuantity || isAdding }"
-              >
+                :class="{ 'opacity-50 cursor-not-allowed': !product.stockQuantity || isAdding }">
                 <span v-if="isAdding" class="flex items-center justify-center">
                   <div class="w-5 h-5 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   Ajout en cours...
@@ -186,18 +182,14 @@
                   {{ product.stockQuantity ? `Ajouter au panier (${quantity})` : 'Rupture de stock' }}
                 </span>
               </button>
-              
-              <button 
-                class="btn btn-outline py-4 px-6 flex items-center justify-center text-xl"
-                :class="isFavorite ? 'text-red-500' : 'text-gray-500'"
-                @click="toggleFavorite"
-                :aria-pressed="isFavorite"
-                :title="isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'"
-              >
+
+              <button class="btn btn-outline py-4 px-6 flex items-center justify-center text-xl"
+                :class="isFavorite ? 'text-red-500' : 'text-gray-500'" @click="toggleFavorite"
+                :aria-pressed="isFavorite" :title="isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'">
                 <span v-if="isFavorite">❤️</span>
                 <span v-else>🤍</span>
               </button>
-              
+
               <button class="btn btn-outline py-4 px-6">
                 📤
               </button>
@@ -244,13 +236,10 @@
       <div v-if="product && similarProducts.length > 0" class="mt-16">
         <h2 class="text-2xl font-bold text-gray-900 mb-8">Produits similaires</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div v-for="similarProduct in similarProducts" :key="similarProduct.id" class="card hover:shadow-lg transition-shadow">
+          <div v-for="similarProduct in similarProducts" :key="similarProduct.id"
+            class="card hover:shadow-lg transition-shadow">
             <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-t-lg overflow-hidden">
-              <img 
-                :src="getProductImage(similarProduct)" 
-                :alt="similarProduct.name"
-                class="w-full h-48 object-cover"
-              >
+              <img :src="getProductImage(similarProduct)" :alt="similarProduct.name" class="w-full h-48 object-cover">
             </div>
             <div class="card-body">
               <h3 class="font-semibold text-lg mb-2 line-clamp-2">{{ similarProduct.name }}</h3>
@@ -263,10 +252,7 @@
                     {{ similarProduct.price }}€
                   </span>
                 </div>
-                <router-link 
-                  :to="`/products/${similarProduct.id}`"
-                  class="btn btn-primary btn-sm"
-                >
+                <router-link :to="`/products/${similarProduct.id}`" class="btn btn-primary btn-sm">
                   Voir
                 </router-link>
               </div>
@@ -354,36 +340,33 @@ const getProductImage = (product: Product) => {
   // eslint-disable-next-line no-console
   console.log('DEBUG product.images:', product.images)
   // 1. Si le produit a un tableau d'images
+  // Remove trailing '/api' from API_URL for static asset URLs
+  const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/api$/, '');
   if (product.images && Array.isArray(product.images) && product.images.length > 0) {
-    // Cas images tableau d'objets { url }
     if (typeof product.images[0] === 'object' && product.images[0] !== null) {
-      // Chercher une image principale (isPrimary)
-      const primary = (product.images as Array<{ url?: string; isPrimary?: boolean }>).find(img => typeof img === 'object' && img !== null && img.isPrimary && typeof img.url === 'string')
-      if (primary && primary.url) return primary.url
-      // Sinon prendre la première image avec une url
-      const firstImg = (product.images as Array<{ url?: string }>).find(img => typeof img === 'object' && img !== null && typeof img.url === 'string')
-      if (firstImg && firstImg.url) return firstImg.url
+      const primary = (product.images as Array<{ url?: string; isPrimary?: boolean }>).
+        find(img => typeof img === 'object' && img !== null && img.isPrimary && typeof img.url === 'string')
+      let url = (primary && primary.url) ? primary.url : ((product.images as Array<{ url?: string }>).
+        find(img => typeof img === 'object' && img !== null && typeof img.url === 'string') || {}).url;
+      if (url) return url.startsWith('/uploads') ? API_URL + url : url;
     }
-    // Cas images tableau de chaînes (string)
     if (typeof product.images[0] === 'string') {
-      return product.images[0] as string
+      const url = product.images[0] as string;
+      return url.startsWith('/uploads') ? API_URL + url : url;
     }
   }
-  // 2. Si le produit a un champ image (string)
   if ((product as any).image && typeof (product as any).image === 'string') {
-    return (product as any).image
+    const url = (product as any).image;
+    return url.startsWith('/uploads') ? API_URL + url : url;
   }
-  // 3. Sinon utiliser l'utilitaire (pour compat SQL)
   if (getProductImageUrl) {
     const url = getProductImageUrl(product)
     if (url && !url.endsWith('/placeholder.svg')) return url
   }
-  // 4. Sinon image de la catégorie
   if (product.category?.slug) {
     return getCategoryImageUrl(product.category.slug)
   }
-  // 5. Image par défaut
-  return '/placeholder.svg'
+  return '/placeholder.svg';
 }
 
 // Actions
@@ -476,4 +459,4 @@ onMounted(() => {
 watch(product, () => {
   checkFavorite()
 })
-</script> 
+</script>

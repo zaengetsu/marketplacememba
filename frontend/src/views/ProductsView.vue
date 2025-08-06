@@ -96,7 +96,7 @@
             class="grid grid-cols-1 gap-x-8 gap-y-8 sm:grid-cols-2 sm:gap-y-10 lg:grid-cols-3">
             <div v-for="product in products" :key="product.id" class="group relative">
               <div class="relative">
-                <img :src="getProductImageUrl(product)" :alt="product.name"
+                <img :src="getProductImage(product)" :alt="product.name"
                   class="aspect-[4/3] w-full rounded-lg bg-gray-100 object-cover" />
                 <!-- Badge promotion -->
                 <div v-if="product.isOnSale && product.salePrice"
@@ -132,7 +132,8 @@
                     {{ formatCurrency(product.isOnSale && product.salePrice ? product.salePrice : product.price) }} TTC
                   </span>
                   <span class="text-xs text-gray-500">
-                    HT : {{ formatCurrency((product.isOnSale && product.salePrice ? product.salePrice : product.price) / 1.2) }}
+                    HT : {{ formatCurrency((product.isOnSale && product.salePrice ? product.salePrice : product.price) /
+                    1.2) }}
                   </span>
                   <span v-if="product.isOnSale && product.salePrice" class="line-through text-gray-400 text-sm">
                     {{ formatCurrency(product.price) }}
@@ -346,6 +347,26 @@ const resetFilters = () => {
   currentPage.value = 1
   loadProducts()
 }
+// Fonction utilitaire locale pour gérer les images MongoDB/SQL
+// Remove trailing '/api' from API_URL for static asset URLs
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/api$/, '');
+const getProductImage = (product: any) => {
+  if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+    // Cas MongoDB : tableau d'objets { url }
+    if (typeof product.images[0] === 'object' && product.images[0] !== null) {
+      const primary = product.images.find((img: any) => img.isPrimary && img.url)
+      let url = (primary && primary.url) ? primary.url : (product.images.find((img: any) => img.url) || {}).url;
+      if (url) return url.startsWith('/uploads') ? API_URL + url : url;
+    }
+    // Cas SQL : tableau de chaînes
+    if (typeof product.images[0] === 'string') {
+      const url = product.images[0];
+      return url.startsWith('/uploads') ? API_URL + url : url;
+    }
+  }
+  return '/placeholder.svg';
+}
+
 
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {

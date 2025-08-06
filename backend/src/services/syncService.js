@@ -82,7 +82,11 @@ class SyncService {
       }));
 
       if (mongoProducts.length > 0) {
-        await ProductSearch.insertMany(mongoProducts);
+        logger.info('Produits à insérer dans MongoDB:', JSON.stringify(mongoProducts, null, 2));
+        const insertResult = await ProductSearch.insertMany(mongoProducts);
+        logger.info(`Résultat insertMany: ${JSON.stringify(insertResult, null, 2)}`);
+      } else {
+        logger.warn('Aucun produit à insérer dans MongoDB (mongoProducts est vide)');
       }
 
       logger.info(`Synced ${products.length} products`);
