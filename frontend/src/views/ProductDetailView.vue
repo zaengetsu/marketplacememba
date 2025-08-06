@@ -350,15 +350,39 @@ const getStockClass = (stockQuantity: number) => {
 }
 
 const getProductImage = (product: Product) => {
-  // Utiliser d'abord l'image du produit si elle existe
-  if (product.images && product.images.length > 0) {
-    return getProductImageUrl(product)
+  // DEBUG: Afficher la structure des images pour diagnostic
+  // eslint-disable-next-line no-console
+  console.log('DEBUG product.images:', product.images)
+  // 1. Si le produit a un tableau d'images
+  if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+    // Cas images tableau d'objets { url }
+    if (typeof product.images[0] === 'object' && product.images[0] !== null) {
+      // Chercher une image principale (isPrimary)
+      const primary = (product.images as Array<{ url?: string; isPrimary?: boolean }>).find(img => typeof img === 'object' && img !== null && img.isPrimary && typeof img.url === 'string')
+      if (primary && primary.url) return primary.url
+      // Sinon prendre la première image avec une url
+      const firstImg = (product.images as Array<{ url?: string }>).find(img => typeof img === 'object' && img !== null && typeof img.url === 'string')
+      if (firstImg && firstImg.url) return firstImg.url
+    }
+    // Cas images tableau de chaînes (string)
+    if (typeof product.images[0] === 'string') {
+      return product.images[0] as string
+    }
   }
-  // Sinon utiliser l'image de la catégorie
+  // 2. Si le produit a un champ image (string)
+  if ((product as any).image && typeof (product as any).image === 'string') {
+    return (product as any).image
+  }
+  // 3. Sinon utiliser l'utilitaire (pour compat SQL)
+  if (getProductImageUrl) {
+    const url = getProductImageUrl(product)
+    if (url && !url.endsWith('/placeholder.svg')) return url
+  }
+  // 4. Sinon image de la catégorie
   if (product.category?.slug) {
     return getCategoryImageUrl(product.category.slug)
   }
-  // Image par défaut
+  // 5. Image par défaut
   return '/placeholder.svg'
 }
 
@@ -397,26 +421,31 @@ const loadProduct = async () => {
   try {
     loading.value = true
     error.value = null
-    
     const productId = route.params.id as string
-    
-    // Charger le produit depuis l'API
-    const response = await productService.getProduct(productId)
-    
+
+    // Détection ObjectId MongoDB (24 caractères hexadécimaux)
+    const isMongoId = /^[a-fA-F0-9]{24}$/.test(productId)
+    let response
+    if (isMongoId) {
+      response = await fetch(`${import.meta.env.VITE_API_URL}/products/mongo/${productId}`)
+      response = await response.json()
+    } else {
+      response = await productService.getProduct(productId)
+    }
+
     if (response.success && response.data) {
-      // On force price et salePrice à être des nombres pour éviter les bugs d'affichage
       const prod = response.data
       prod.price = Number(prod.price) || 0
       prod.salePrice = prod.salePrice !== undefined ? Number(prod.salePrice) : undefined
       product.value = prod
 
       // Charger les produits similaires (même catégorie)
-      if (product.value && product.value.categoryId) {
+      if (product.value && (product.value.categoryId || product.value.category?.id)) {
+        const catId = product.value.categoryId || product.value.category?.id
         const similarResponse = await productService.getProducts({
-          category: product.value.categoryId.toString(),
+          category: catId.toString(),
           limit: 4
         })
-        
         if (similarResponse.success && similarResponse.data && similarResponse.data.products) {
           similarProducts.value = similarResponse.data.products.filter((p: any) => p.id !== product.value!.id)
         }
@@ -424,7 +453,6 @@ const loadProduct = async () => {
     } else {
       error.value = 'Le produit demandé n\'existe pas ou n\'est plus disponible.'
     }
-    
   } catch (err) {
     console.error('Erreur lors du chargement du produit:', err)
     error.value = 'Erreur lors du chargement du produit.'

@@ -59,6 +59,17 @@ class SyncService {
         salePrice: product.salePrice,
         isOnSale: product.isOnSale,
         stockQuantity: product.stockQuantity,
+        images: product.images && Array.isArray(product.images)
+          ? product.images.map(img =>
+              typeof img === 'object' && img !== null
+                ? {
+                    url: img.url || (typeof img === 'string' ? img : ''),
+                    alt: img.alt || product.name,
+                    isPrimary: img.isPrimary || false
+                  }
+                : { url: img, alt: product.name, isPrimary: false }
+            )
+          : [],
         category: product.category ? {
           id: product.category.id,
           name: product.category.name,
@@ -166,6 +177,17 @@ class SyncService {
         salePrice: product.salePrice,
         isOnSale: product.isOnSale,
         stockQuantity: product.stockQuantity,
+        images: product.images && Array.isArray(product.images)
+          ? product.images.map(img =>
+              typeof img === 'object' && img !== null
+                ? {
+                    url: img.url || (typeof img === 'string' ? img : ''),
+                    alt: img.alt || product.name,
+                    isPrimary: img.isPrimary || false
+                  }
+                : { url: img, alt: product.name, isPrimary: false }
+            )
+          : [],
         category: product.category ? {
           id: product.category.id,
           name: product.category.name,

@@ -282,6 +282,7 @@ const loadProducts = async () => {
       products.value = (response.data.data.products || []).map((prod: any) => {
         return {
           ...prod,
+          id: prod.id || prod._id, // Compatibilité Mongo/SQL
           price: Number(prod.price) || 0,
           salePrice: prod.salePrice !== undefined ? Number(prod.salePrice) : undefined
         }

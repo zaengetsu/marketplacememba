@@ -35,6 +35,11 @@ const productSearchSchema = new mongoose.Schema({
     default: 0,
     index: true
   },
+  images: [{
+    url: String,
+    alt: String,
+    isPrimary: Boolean
+  }],
   category: {
     id: Number,
     name: String,

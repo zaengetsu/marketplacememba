@@ -1,3 +1,4 @@
+
 // --- Recherche avancée MongoDB (ProductSearch) ---
 const ProductSearch = require('../models/ProductSearch');
 const express = require('express');
@@ -217,6 +218,29 @@ router.get('/search-mongo', async (req, res) => {
   }
 });
 
+// GET /api/products/mongo/:id - Détail d'un produit MongoDB (public)
+router.get('/mongo/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const product = await ProductSearch.findById(id);
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Produit non trouvé (Mongo)'
+      });
+    }
+    res.json({
+      success: true,
+      data: product
+    });
+  } catch (error) {
+    logger.error('Error fetching product from Mongo:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erreur lors de la récupération du produit (Mongo)'
+    });
+  }
+});
 // GET /api/products/:id - Détail d'un produit (public)
 router.get('/:id', async (req, res) => {
   try {
