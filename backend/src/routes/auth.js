@@ -125,8 +125,7 @@ router.post('/register', registerLimiter, registerValidation, async (req, res) =
 // @desc    Connexion utilisateur
 // @route   POST /api/auth/login
 // @access  Public
-// router.post('/login', authLimiter, [
-router.post('/login', [
+router.post('/login', authLimiter, [
   body('email').isEmail().normalizeEmail().withMessage('Email invalide'),
   body('password').notEmpty().withMessage('Mot de passe requis')
 ], async (req, res) => {
@@ -291,7 +290,8 @@ router.post('/forgot-password', async (req, res) => {
     await user.save();
 
     // Envoie l'email avec le lien de réinitialisation
-    const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
+    const frontendUrl = process.env.FRONTEND_URL;
+    const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
     await emailService.sendPasswordResetEmail(user.email, resetToken);
 
     res.json({ success: true, message: 'Un email de réinitialisation a été envoyé.' });

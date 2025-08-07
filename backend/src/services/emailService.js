@@ -121,7 +121,7 @@ class EmailService {
           <h2>Nouveau produit disponible !</h2>
           
           <div style="border: 1px solid #ddd; border-radius: 8px; overflow: hidden; margin: 20px 0;">
-            <img src="${process.env.BACKEND_URL || 'http://localhost:4000'}${product.images[0] || '/placeholder.jpg'}" alt="${product.name}" style="width: 100%; height: 200px; object-fit: cover;">
+            <img src="${process.env.BACKEND_URL}${product.images[0] || '/placeholder.jpg'}" alt="${product.name}" style="width: 100%; height: 200px; object-fit: cover;">
             
             <div style="padding: 20px;">
               <h3 style="margin: 0 0 10px 0; color: #333;">${product.name}</h3>

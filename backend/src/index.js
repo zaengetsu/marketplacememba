@@ -112,13 +112,14 @@ if (process.env.REDIS_URL) {
 }
 
 // Middlewares de sécurité
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https:", "http://localhost:5173"],
+      imgSrc: ["'self'", "data:", "https:", FRONTEND_URL],
       scriptSrc: ["'self'"],
       connectSrc: ["'self'", "https://api.stripe.com"]
     }
@@ -129,7 +130,7 @@ app.use(helmet({
 
 // Configuration CORS
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174'],
+  origin: [FRONTEND_URL],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
@@ -138,7 +139,7 @@ app.use(cors({
 // Servir les fichiers statiques avec CORS explicite (chemin absolu)
 const path = require('path');
 app.use('/uploads', (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+  res.header('Access-Control-Allow-Origin', FRONTEND_URL);
   res.header('Access-Control-Allow-Methods', 'GET');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   next();
@@ -258,7 +259,7 @@ const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => {
   logger.info(`🚀 Serveur démarré sur le port ${PORT}`);
   logger.info(`🌍 Environnement: ${process.env.NODE_ENV}`);
-  logger.info(`📊 API disponible sur http://localhost:${PORT}/api`);
+  logger.info(`📊 API disponible sur ${process.env.BACKEND_PUBLIC_URL ? process.env.BACKEND_PUBLIC_URL + '/api' : 'http://localhost:' + PORT + '/api'}`);
 });
 
 // Gestion propre de l'arrêt du serveur
