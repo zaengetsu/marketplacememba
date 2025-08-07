@@ -196,7 +196,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useCartStore } from '../stores/cart'
 import { categoryService } from '../services/api'
 import axios from 'axios'
@@ -206,6 +206,7 @@ import { useToast } from 'vue-toastification'
 import { getProductImageUrl } from '../utils/image'
 
 const route = useRoute()
+const router = useRouter()
 const cartStore = useCartStore()
 const toast = useToast()
 
@@ -232,6 +233,18 @@ const onlyOnSale = ref(false)
 const onlyInStock = ref(false)
 const sortBy = ref('name')
 
+// Met à jour l'URL à chaque changement de filtre
+const updateUrlQuery = () => {
+  const query: any = {}
+  if (selectedCategory.value) query.category = selectedCategory.value
+  if (searchQuery.value) query.search = searchQuery.value
+  if (maxPrice.value < 2000) query.maxPrice = maxPrice.value
+  if (onlyOnSale.value) query.onSale = 'true'
+  if (onlyInStock.value) query.inStock = 'true'
+  if (sortBy.value && sortBy.value !== 'name') query.sortBy = sortBy.value
+  router.replace({ query })
+}
+
 // Pagination
 const currentPage = ref(1)
 const itemsPerPage = 12
@@ -244,6 +257,7 @@ const debouncedSearch = () => {
   clearTimeout(searchTimeout)
   searchTimeout = setTimeout(() => {
     currentPage.value = 1
+    updateUrlQuery()
     loadProducts()
   }, 500)
 }
@@ -275,6 +289,8 @@ const loadProducts = async () => {
     if (maxPrice.value < 2000) params.maxPrice = maxPrice.value
     if (onlyOnSale.value) params.onSale = true
     if (onlyInStock.value) params.inStock = true
+
+    updateUrlQuery()
 
     // Appel direct à la route Mongo
     const response = await axios.get(`${import.meta.env.VITE_API_URL}/products/search-mongo`, { params })
@@ -345,6 +361,7 @@ const resetFilters = () => {
   onlyOnSale.value = false
   onlyInStock.value = false
   currentPage.value = 1
+  updateUrlQuery()
   loadProducts()
 }
 // Fonction utilitaire locale pour gérer les images MongoDB/SQL
@@ -389,16 +406,20 @@ const formatCurrency = (amount: number) => {
   }).format(amount)
 }
 
-// Watcher pour les paramètres de route
-watch(() => route.query.category, (newCategory) => {
-  if (newCategory) {
-    const category = categories.value.find(cat => cat.slug === newCategory)
-    if (category) {
-      selectedCategory.value = category.id.toString()
-      loadProducts()
-    }
-  }
-}, { immediate: true })
+
+// Watcher pour synchroniser les filtres avec l'URL au chargement ou navigation
+onMounted(() => {
+  // Appliquer les filtres depuis l'URL si présents
+  const q = route.query
+  if (q.category) selectedCategory.value = String(q.category)
+  if (q.search) searchQuery.value = String(q.search)
+  if (q.maxPrice) maxPrice.value = Number(q.maxPrice)
+  if (q.onSale) onlyOnSale.value = q.onSale === 'true'
+  if (q.inStock) onlyInStock.value = q.inStock === 'true'
+  if (q.sortBy) sortBy.value = String(q.sortBy)
+  loadCategories()
+  loadProducts()
+})
 
 onMounted(async () => {
   await loadCategories()
